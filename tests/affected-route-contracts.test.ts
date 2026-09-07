@@ -260,8 +260,10 @@ describe("affected route contracts", () => {
 
   it("advertises the brand routes in the sitemap, not only the store and legal pages", () => {
     // The restructure exists to lead with land and producers; those were the
-    // only pages the sitemap did not carry.
-    for (const path of [routes.farm, routes.soil, routes.kabiaStandard, routes.journal, routes.producers]) {
+    // only pages the sitemap did not carry. "/toprak" is a literal: this
+    // branch removed the routes.soil helper, but the page still exists and
+    // stays advertised (see lib/site.ts).
+    for (const path of [routes.farm, "/toprak", routes.kabiaStandard, routes.journal, routes.producers]) {
       assert.ok(
         sitemapStaticPaths.some((entry) => entry.path === path),
         `${path} must be advertised in the sitemap`,
