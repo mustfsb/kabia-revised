@@ -6,7 +6,7 @@ import Link from "next/link"
 import { PageShell } from "@/components/layout/page-shell"
 import { ProductEntry } from "@/components/shop/product-entry"
 import { createSupabaseServerClient } from "@/lib/supabase/server"
-import { fetchPublishedProducerBySlug, type Producer } from "@/lib/producers"
+import { fetchPublishedProducerBySlug, splitStoryParagraphs, type Producer } from "@/lib/producers"
 import { fetchProductsByProducer } from "@/lib/catalog"
 import type { Product } from "@/lib/products"
 import { sourceProducers } from "@/content/producers"
@@ -117,7 +117,14 @@ export default async function ProducerDetailPage({ params }: { params: Promise<{
         )}
 
         <div className="mx-auto mt-10 max-w-[42rem] md:mt-14">
-          {producer.story && <p className="text-base leading-relaxed text-ink/70 md:text-lg">{producer.story}</p>}
+          {splitStoryParagraphs(producer.story).map((paragraph, index) => (
+            <p
+              key={index}
+              className="mt-5 text-base leading-relaxed text-ink/70 first:mt-0 md:text-lg"
+            >
+              {paragraph}
+            </p>
+          ))}
 
           <dl>
             <Field label="Üretim yeri" value={producer.productionPlace} />
