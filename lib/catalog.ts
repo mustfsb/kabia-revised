@@ -101,6 +101,7 @@ export function mapProduct(row: ProductRow, includeReviews = false): Product {
     // category as "Çiğ Badem"; an unreadable category is now simply absent.
     category: row.category?.slug ?? "",
     categoryName: row.category?.name ?? "",
+    categorySortOrder: row.category?.sort_order ?? 0,
     source: toSource(row.source),
     defaultWeight: defaultVariant?.weight ?? "",
     producerId: row.producer_id ?? null,
@@ -145,7 +146,7 @@ const PRODUCT_SELECT = `
   processing, allergens, net_weight,
   short_description, description, is_active, is_featured, created_at,
   rating_avg, rating_count, rating_breakdown,
-  category:categories(slug, name),
+  category:categories(slug, name, sort_order),
   producer:producers(slug, name, why_selected),
   product_variants(id, label, price, stock_quantity),
   product_images(image_url, sort_order),
@@ -160,7 +161,7 @@ const PRODUCT_LEAN_SELECT = `
   id, slug, name, base_price, main_image_url, source, certification,
   short_description, is_active, is_featured, created_at,
   rating_avg, rating_count,
-  category:categories(slug, name)
+  category:categories(slug, name, sort_order)
 `
 
 // ---- async fetch functions (accept a server or browser client) ----

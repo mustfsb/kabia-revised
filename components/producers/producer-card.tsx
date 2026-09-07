@@ -4,7 +4,16 @@ import { ButtonLink } from "@/components/ui/button"
 import { routes } from "@/lib/site"
 import type { Producer } from "@/lib/producers"
 
-type CardProducer = Omit<Producer, "createdAt"> & { desc?: string }
+/**
+ * Database producers carry the administered `tagline`; the preview content
+ * file carries `desc` under the same meaning. The card prefers the administered
+ * value and falls back, so both paths render the same line without either
+ * having to reshape into the other.
+ */
+type CardProducer = Omit<Producer, "createdAt" | "tagline" | "sortOrder"> & {
+  desc?: string
+  tagline?: string | null
+}
 
 function CardImage({ producer, priority }: { producer: CardProducer; priority: boolean }) {
   return (
@@ -62,8 +71,8 @@ export function ProducerCard({
 
         <div className="mt-5 flex flex-1 flex-col border-t border-ink/10 pt-4">
           <h2 className="text-xl leading-snug tracking-tight">{producer.name}</h2>
-          {producer.desc && (
-            <p className="mt-2 text-sm leading-relaxed text-ink/60">{producer.desc}</p>
+          {(producer.tagline ?? producer.desc) && (
+            <p className="mt-2 text-sm leading-relaxed text-ink/60">{producer.tagline ?? producer.desc}</p>
           )}
           {producer.productType && (
             <p className="label mt-3 text-olive">{producer.productType}</p>

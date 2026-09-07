@@ -12,7 +12,10 @@ export const metadata: Metadata = {
   alternates: { canonical: "/ureticiler" },
 }
 
-type GridProducer = Omit<Producer, "createdAt"> & { desc?: string }
+type GridProducer = Omit<Producer, "createdAt" | "tagline" | "sortOrder"> & {
+  desc?: string
+  tagline?: string | null
+}
 
 /** The page heading, shared by every state so the page reads the same either way. */
 function Heading() {
