@@ -5,7 +5,7 @@ import {
   formatTL,
   inStock,
   isOrganicCertified,
-  sourceBadgeLabel,
+  productMetaLine,
   type Product,
 } from "@/lib/products";
 import { routes } from "@/lib/site";
@@ -67,7 +67,7 @@ export function ProductEntry({
         </div>
 
         <div className="mt-5 border-t border-ink/10 pt-4">
-          <p className="label text-olive">{product.categoryLabel} • {sourceBadgeLabel(product.source)}</p>
+          <p className="label text-olive">{productMetaLine(product)}</p>
           {organic && (
             <p className="label mt-2 text-brand">{CERTIFICATION_LABEL[product.certification]}</p>
           )}

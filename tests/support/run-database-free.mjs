@@ -6,6 +6,8 @@ const files = [
   "auth-rate-limit", "order-state-machine", "security-headers", "shop-banner",
   "theme-engine-resolver", "theme-preview-cookie", "theme-editor-ui",
   "farm-content", "admin-nav", "brand-preview", "preview-identity", "preview-order-boundary", "store-listing",
+  "affected-route-contracts", "homepage-intro",
+  "admin-product-fields", "admin-product-schema",
 ].map(name => `tests/${name}.test.ts`);
 files.push("tests/client-boundary.test.js");
 const env = { ...process.env };

@@ -1,11 +1,12 @@
 "use server"
 
-import { revalidatePath } from "next/cache"
+import { revalidatePath, updateTag } from "next/cache"
 import { z } from "zod"
 import { adminContext } from "@/lib/admin/auth"
 import { logAdminAction } from "@/lib/admin/audit"
 import { toActionState } from "@/lib/admin/errors"
 import { uuid } from "@/lib/admin/schemas"
+import { HOMEPAGE_INTRO_TAG } from "@/lib/catalog"
 
 const featureSchema = z.object({
   product_id: uuid,
@@ -13,11 +14,15 @@ const featureSchema = z.object({
 })
 
 /**
- * Toggles a product's place in the homepage selection.
+ * Toggles a product's place in the homepage introduction.
  *
  * This is the whole of "homepage featured products" — a flag on a real product,
- * not a page builder. The premium homepage's layout, copy and imagery stay in
- * code where they belong; only the *selection* is operational data.
+ * not a page builder. The homepage's layout, statement lines and source names
+ * stay in code where they belong; only the *selection* is operational data.
+ *
+ * The homepage introduces one product per source, so marking a second product
+ * of the same source does not add a fourth tile: display order decides which
+ * one introduces that source. See lib/homepage-intro.ts.
  */
 export async function toggleFeaturedAction(formData: FormData): Promise<void> {
   try {
@@ -63,6 +68,12 @@ export async function toggleFeaturedAction(formData: FormData): Promise<void> {
       metadata: { name: before.name, area: "homepage_featured" },
     })
 
+    // The homepage introduction is read through unstable_cache, which
+    // revalidatePath does not reach — the tag is what makes the change show up
+    // straight away instead of after the 300s ceiling. `updateTag` rather than
+    // `revalidateTag` for the same reason the settings action gives: this is a
+    // Server Action and the operator must see their own write.
+    updateTag(HOMEPAGE_INTRO_TAG)
     revalidatePath("/")
     revalidatePath("/shop")
     revalidatePath("/magaza")

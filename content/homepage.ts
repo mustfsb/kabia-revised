@@ -60,10 +60,15 @@ export const manifesto = {
  * storefront row. Price, stock, badges and purchase controls belong to the shop
  * and the product page, never here.
  *
- * The slugs are curated rather than queried, so the section keeps the same three
- * products regardless of what the catalogue is doing. They are the verified
- * active rows: `kabuklu-badem`, `findik-ici` and `tarhana`. The name recorded
- * here is the short display name; `findik-ici` ships under the name
+ * Which product introduces each source is an administrator's decision, made on
+ * /admin/content and resolved by lib/homepage-intro.ts. The entries below are
+ * the FALLBACK, used for a source with no featured product and whenever the
+ * catalogue cannot be read — so the section degrades to these verified active
+ * rows rather than to an empty or broken tile.
+ *
+ * `statement`, `intro`, `sourceName` and the images here are editorial and are
+ * never overridden. The name and slug recorded per entry are the short display
+ * name of the fallback product; `findik-ici` ships under the name
  * "Kabuklu Fındık", and that existing slug/name mismatch is left alone.
  */
 export const products = {

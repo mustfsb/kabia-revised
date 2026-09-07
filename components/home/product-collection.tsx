@@ -6,6 +6,8 @@ import { ArrowLink } from "@/components/ui/button";
 import { routes } from "@/lib/site";
 import { isBrandPreview } from "@/lib/brand-preview";
 import { previewProducts } from "@/content/preview-products";
+import { getCachedHomepageIntro } from "@/lib/catalog";
+import { isPlausibleBannerImageUrl } from "@/lib/shop-banner";
 
 /**
  * The three sources, one product each — an introduction, not a storefront.
@@ -15,21 +17,45 @@ import { previewProducts } from "@/content/preview-products";
  * a single link wrapping its image, source name and product name, so the whole
  * tile is one target and there is no second action link to compete with it.
  *
- * The three products are curated in content/homepage.ts rather than read from
- * the catalogue, so the section stays fixed at three and cannot be reshuffled
- * by whatever is featured that week. That also means the homepage no longer
- * queries the catalogue at all.
+ * The section stays fixed at three — one per source — and its statement lines,
+ * intro and source names stay editorial, in content/homepage.ts. Which product
+ * introduces each source is operational: it is the product an administrator
+ * marked as featured on /admin/content, resolved by lib/homepage-intro.ts.
+ *
+ * The curated entry for a source is the fallback, used when that source has no
+ * featured product and when the catalogue cannot be read at all. So the worst
+ * case is today's behaviour, never an empty or broken section.
  */
-export function ProductCollection() {
+export async function ProductCollection() {
   // With the gate on, each entry points at the local preview product for its
-  // own source so the design review has something to click through to. With it
-  // off — always, in normal operation — these are the verified real slugs.
+  // own source so the design review has something to click through to, and the
+  // curated copy is left exactly as it is — preview behaviour is unchanged.
   const preview = isBrandPreview();
-  const hrefFor = (entry: (typeof copy.entries)[number]) => {
-    if (!preview) return routes.product(entry.slug);
-    const local = previewProducts.find((p) => p.source === entry.source);
-    return routes.product(local ? local.slug : entry.slug);
+  const intro = preview ? {} : await getCachedHomepageIntro();
+
+  const resolve = (entry: (typeof copy.entries)[number]) => {
+    if (preview) {
+      const local = previewProducts.find((p) => p.source === entry.source);
+      return { ...entry, href: routes.product(local ? local.slug : entry.slug) };
+    }
+
+    const chosen = intro[entry.source];
+    if (!chosen) return { ...entry, href: routes.product(entry.slug) };
+
+    // next/image throws at render for a host outside the allowlist, which would
+    // take the homepage down; an implausible product image keeps the curated
+    // one. Same guard, and the same allowlist, as the shop banner.
+    const usable = isPlausibleBannerImageUrl(chosen.mainImageUrl);
+    return {
+      ...entry,
+      name: chosen.name,
+      image: usable ? chosen.mainImageUrl : entry.image,
+      alt: usable ? chosen.name : entry.alt,
+      href: routes.product(chosen.slug),
+    };
   };
+
+  const entries = copy.entries.map(resolve);
 
   return (
     <section
@@ -59,9 +85,9 @@ export function ProductCollection() {
         </div>
 
         <ul className="mt-16 grid grid-cols-1 gap-x-8 gap-y-14 sm:grid-cols-2 lg:grid-cols-3">
-          {copy.entries.map((entry, index) => (
-            <Reveal as="li" key={entry.slug} delay={index * 0.05} className="group">
-              <Link href={hrefFor(entry)} className="block">
+          {entries.map((entry, index) => (
+            <Reveal as="li" key={entry.source} delay={index * 0.05} className="group">
+              <Link href={entry.href} className="block">
                 <div className="relative aspect-[4/3] overflow-hidden rounded-media bg-ivory">
                   <Image
                     src={entry.image}
