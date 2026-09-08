@@ -1,13 +1,19 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { PageShell } from "@/components/layout/page-shell";
 import { StoreListing, type StoreSearch } from "@/components/shop/store-listing";
+import { ShopHeroBanner } from "@/components/shop/shop-hero-banner";
 import { isBrandPreview } from "@/lib/brand-preview";
 import { sourceProducers } from "@/content/producers";
 import { previewProducts } from "@/content/preview-products";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { fetchPublishedProducerBySlug } from "@/lib/producers";
+import { fetchPublishedProducerBySlug, splitStoryParagraphs } from "@/lib/producers";
 import { fetchProductsByProducer } from "@/lib/catalog";
+import { getPublicSettings } from "@/lib/settings";
+import { shopBannerVisible, type ShopBannerSettings } from "@/lib/shop-banner";
+import { routes } from "@/lib/site";
 
 type Params = Promise<{ "producer-slug": string }>;
 
@@ -87,9 +93,33 @@ export default async function ProducerStore({
   const subtitle = [producer.productType, producer.region]
     .filter(Boolean)
     .join(" — ");
+  const excerpt = splitStoryParagraphs(producer.story)[0] ?? null;
+
+  // The global shop banner, behind the same visibility rule as /shop — the
+  // route simply never read settings before. Same component, same position
+  // above the page section, so a producer store reads as one more store page.
+  const settings = await getPublicSettings();
+  const banner: ShopBannerSettings = {
+    enabled: settings.shopBannerEnabled,
+    headline: settings.shopBannerHeadline,
+    subtext: settings.shopBannerSubtext,
+    imageUrl: settings.shopBannerImageUrl,
+    ctaLabel: settings.shopBannerCtaLabel,
+    ctaHref: settings.shopBannerCtaHref,
+  };
+  const showBanner = shopBannerVisible(banner);
 
   return (
     <PageShell>
+      {showBanner && (
+        <ShopHeroBanner
+          headline={banner.headline}
+          subtext={banner.subtext}
+          imageUrl={banner.imageUrl}
+          ctaLabel={banner.ctaLabel}
+          ctaHref={banner.ctaHref}
+        />
+      )}
       <section className="wrap page-top">
         <p className="label text-olive">Mağaza</p>
         <h1 className="mt-6 max-w-3xl text-4xl leading-[1.08] tracking-tight md:text-6xl">
@@ -99,6 +129,37 @@ export default async function ProducerStore({
           <p className="mt-7 max-w-md text-base leading-relaxed text-ink/65">
             {subtitle}
           </p>
+        )}
+        {producer.tagline && (
+          <p className="mt-4 max-w-md text-base leading-relaxed text-ink/65">
+            {producer.tagline}
+          </p>
+        )}
+
+        {producer.photoUrl && (
+          <div className="relative mt-10 aspect-[16/9] max-w-4xl overflow-hidden rounded-media bg-paper">
+            <Image
+              src={producer.photoUrl}
+              alt={producer.name}
+              fill
+              sizes="(min-width: 1024px) 56rem, 100vw"
+              className="object-cover"
+            />
+          </div>
+        )}
+
+        {excerpt && (
+          <div className="mt-8 max-w-[42rem]">
+            <p className="text-base leading-relaxed text-ink/70">{excerpt}</p>
+            <Link
+              href={routes.producer(producer.slug)}
+              prefetch={false}
+              className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm text-ink/60 transition-colors duration-300 hover:text-ink"
+            >
+              Hikâyenin tamamı
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
         )}
 
         <div className="mt-14 md:mt-20">
