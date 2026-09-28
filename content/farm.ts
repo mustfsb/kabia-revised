@@ -9,25 +9,30 @@ export const farmPrinciples = [
   "Önce toprak, sonra ağaç.",
   "Toprağı sürmüyoruz.",
   "Otları biçmiyoruz.",
-  "Dışarıdan girdi yok — organik sertifikalı bile olsa gübre almıyoruz.",
   "Tüm girdiler doğadan ve kendi bahçemizden: kompost, kompost gübresi, kompost çayı.",
   "Doğayı kontrol etmiyoruz, taklit ediyoruz.",
   "Her paket hasat tarihli — ne zaman, nereden, kimden."
 ] as const;
-export interface FarmState { id: string; year: string; substep?: string; eyebrow: string; heading: string; paragraphs: readonly string[]; image: string; imageAlt: string }
+export interface FarmState { id: string; year: string; substep?: string; eyebrow?: string; heading?: string; paragraphs?: readonly string[]; image: string; imageAlt: string }
+
+/** Tam emanet manifestosu (3000 emanet sayfasından birebir): kısa özet
+ * hero'da durur, tamamı burada okunur. */
+export const emanetManifesto: readonly { text: string; tone: "body" | "quote" | "closing" }[] = [
+  { text: "Biz toprağın sahibi olduğumuza değil, ona bir süreliğine eşlik ettiğimize inanıyoruz.", tone: "body" },
+  { text: "Bugün üzerinde üretim yaptığımız toprak, bizden önce de vardı; bizden sonra da var olacak. Bu yüzden toprağı yalnızca ürün yetiştirdiğimiz bir kaynak olarak değil, bizden sonraki nesillere bırakacağımız bir emanet olarak görüyoruz.", tone: "body" },
+  { text: "Kabia’da üretimin ölçüsü yalnızca bu yıl aldığımız ürün miktarı değil. Asıl mesele, bugün üretirken toprağın yarın ne durumda olacağı.", tone: "body" },
+  { text: "Daha fazla ürün uğruna toprağı yormak, onu dışarıdan sürekli beslemeye bağımlı hâle getirmek ya da canlılığını azaltmak bize göre gerçek bir üretim değildir. Biz hızlı olanı değil, doğru olanı ve kalıcı olanı arıyoruz.", tone: "body" },
+  { text: "Toprağın içinde görünmeyen ama bütün yaşamı taşıyan bir dünya olduğuna inanıyoruz. Mikroorganizmalar, mantarlar, kökler, böcekler, yabani otlar, su ve organik madde… Hepsi aynı döngünün parçası. Bu nedenle toprağı sterilize edilmesi gereken bir zemin değil, yaşayan bir ekosistem olarak ele alıyoruz.", tone: "body" },
+  { text: "Her uygulamamızda kendimize aynı soruyu soruyoruz:", tone: "body" },
+  { text: "“Bunu bugün yaptığımızda, yarının toprağına ne bırakıyoruz?”", tone: "quote" },
+  { text: "Çünkü bizim için her hasat yalnızca topladığımız ürün değildir. Aynı zamanda bir sonraki yılın toprağına bıraktığımız bir nottur.", tone: "body" },
+  { text: "Kabia’nın amacı toprağı tüketerek üretmek değil; toprakla birlikte üretmek.", tone: "body" },
+  { text: "Bugünün verimini, yarının bereketinden çalmadan elde edebilmek. Toprağın organik maddesini, canlılığını ve üretme gücünü korumak. Suya, ağaca, canlılara ve mevsimlerin doğal ritmine mümkün olduğunca saygı göstermek.", tone: "body" },
+  { text: "Belki bu yol daha yavaş. Belki her zaman en yüksek verimi vaat etmiyor. Ama bizce iyi tarımın gerçek ölçüsü, bir tarladan bugün ne kadar aldığınız değil; yarın orada ne bırakabildiğinizdir.", tone: "body" },
+  { text: "Çünkü toprak bize miras kalmadı.", tone: "body" },
+  { text: "Biz onu gelecekten ödünç aldık.", tone: "closing" },
+] as const;
 export const farmTimeline: readonly FarmState[] = [
-  {
-    "id": "2019",
-    "year": "2019",
-    "eyebrow": "2019 KASIM — OLMAZ DENİLENİ YAPMAK",
-    "heading": "Burada badem olmaz dediler. Biz toprağa kulak verdik.",
-    "paragraphs": [
-      "2019 Kasım, Sabırlar. Hasat sonrası anızda tek bir meşe, uzakta kavaklar. Boş sanılan bu yamaç için “burada badem tutmaz” deniyordu. Bizim niyetimiz yapılmayanı denemekti — verim cetveline değil, toprağın kendi hafızasına güvenmek. O gün anızın üzerine düşen gölgemizle ilk kez sürmeye değil, dinlemeye geldik.",
-      "O kışı analize, rüzgara ve don çukurlarını öğrenmeye ayırdık. Bir yıl boyunca tek bir fidan dikmeden yalnızca gözlemledik. Çünkü Kabia’da hikaye fidanla değil, toprakla başlar. Bu sessiz tarla iki yıl sonra 946 Marinada ile tanışacaktı — cesaret o gün, bu anızda filizlendi."
-    ],
-    "image": "/images/resim22.jpg",
-    "imageAlt": "2019 Kasım — Bahçe kurulmadan önce, Sabırlar"
-  },
   {
     "id": "2021",
     "year": "2021",
@@ -37,7 +42,7 @@ export const farmTimeline: readonly FarmState[] = [
       "2019’da dinlediğimiz o boş yamaç, iki yaz sonra Temmuz sıcağında tek tek can buldu. Her çukur elle açıldı, her Marinada kökleri incitmeden yerleştirildi, can suyu aynı gün verildi. “Olmaz” denilen yamaç, o gün ilk kez bahçe oldu.",
       "O yaz suyu değil, sabrı konuştuk. Tutmayan fidanı gece suladık, tutanı sessizce izledik. 946 fidan aynı anda büyümedi — kimi erken uyandı, kimi bir mevsim bekledi. Ama hepsi aynı toprağı paylaştı, aynı rüzgarı duydu. Bu dikim bir hasat değil, bir emanetin toprağa bırakılışıydı."
     ],
-    "image": "/images/marina-ilk-dikim.jpeg",
+    "image": "/images/ilkdikim.jpg",
     "imageAlt": "2021 Temmuz — 946 Marinada fidan dikimi"
   },
   {
@@ -101,6 +106,18 @@ export const farmTimeline: readonly FarmState[] = [
     ],
     "image": "/images/marinada-2025-don.jpeg",
     "imageAlt": "2025 18 Mart — 4 gün süren don, çiçekte yakalandı"
+  },
+  {
+    "id": "2026",
+    "year": "2026",
+    "eyebrow": "25 Eylül 2026",
+    "heading": "Hasada az kaldı.",
+    "paragraphs": [
+      "Dış kabuklar çatlıyor — dal dal, tek tek. Yeşil kabuk yarıldı mı, bahçe haber vermiş demektir: hasat eli kulağında.",
+      "Şimdi iş beklemekte değil, doğru günü kollamakta. Biz her sabah bahçeye bakıyoruz — kabuk ne derse o. Havalar bu yıl serin gitti; hasat da geçen yıllara göre daha geç olacak. Acelemiz yok — takvime değil, kabuğa bakıyoruz."
+    ],
+    "image": "/images/catlakkabuk.jpg",
+    "imageAlt": "2026 — Dalında yarılmış yeşil kabuklar, içi görünür Marinada bademler"
   }
 ];
 
@@ -120,14 +137,15 @@ export const farmCertificate = {
   eyebrow: "Belge",
   title: "Usulümüz dışarıdan denetleniyor.",
   body: [
-    "Bahçedeki üretim, 5262 sayılı Organik Tarım Kanunu kapsamında ANADOLU Kontrol ve Sertifikasyon tarafından denetleniyor. Elimizdeki müteşebbis sertifikası badem, ceviz ve nadas üretimini kapsıyor — ürünün kendisini değil, onu yetiştirdiğimiz usulü belgeliyor.",
-    "Belge asgari olanı söylüyor; biz bir adım öteye gidiyoruz. Organik sertifikalı bile olsa dışarıdan gübre almıyoruz — girdilerin tamamı kendi bahçemizden çıkıyor.",
+    "Bu belge, bahçemizde kimyasal gübre ve ilaç kullanılmadığını bağımsız denetçilerce onaylıyor. Lezzeti, emeği, toprağın canlılığını anlatmıyor — onları biz anlatıyoruz.",
+    "Belge asgari olanı söyler; biz bir adım ötesini yaparız: sertifikalı olsa bile dışarıdan gübre almayız — girdilerin tamamı kendi bahçemizden çıkıyor.",
   ],
   facts: [
     { label: "Sertifika no", value: "TR-OT-012-MS-510/02" },
     { label: "Veren kurum", value: "ANADOLU Kontrol ve Sertifikasyon — TÜRKAK akrediteli (TS EN ISO/IEC 17065)" },
     { label: "Kapsam", value: "Badem, ceviz, nadas" },
     { label: "Geçerlilik", value: "24 Ekim 2025 — 3 Ekim 2026" },
+    { label: "Yenileme", value: "Ekim 2026 (kapsam güncellenecek)" },
     { label: "Sertifika sahibi", value: "Epilantis Kozmetik Estetik Medikal San. Dış Tic. Ltd. Şti." },
   ],
   image: "/images/organik-sertifika.jpg",

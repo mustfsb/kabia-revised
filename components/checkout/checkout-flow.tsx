@@ -234,7 +234,10 @@ export function CheckoutFlow() {
       </div>
 
       {step === "payment" && (
-        <div className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between border-t border-ink/10 bg-ivory/95 px-6 py-3 backdrop-blur-sm md:hidden">
+        <div
+          className="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between border-t border-ink/10 bg-ivory/95 px-6 pt-3 backdrop-blur-sm md:hidden"
+          style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
+        >
           <span className="label text-olive">{items.length} ürün</span>
           <span className="figure text-base text-ink">{formatTL(total)}</span>
         </div>

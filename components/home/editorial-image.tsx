@@ -20,7 +20,7 @@ export function EditorialImage() {
 
   return (
     <figure ref={ref} className="relative" style={{ contentVisibility: "auto" } as React.CSSProperties}>
-      <div className="relative h-[64vh] overflow-hidden rounded-media md:h-[82vh]">
+      <div className="relative h-[64dvh] overflow-hidden rounded-media md:h-[82dvh]">
         <motion.div
           className="absolute inset-x-0 -inset-y-[8%]"
           style={reducedMotion ? undefined : { y, willChange: "transform" } as never}

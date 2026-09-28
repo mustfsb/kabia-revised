@@ -1,7 +1,7 @@
 import type { Metadata } from "next"
 import { PageShell } from "@/components/layout/page-shell"
 import { ContactForm } from "@/components/contact/contact-form"
-import { site } from "@/lib/site"
+import { site, whatsappHref } from "@/lib/site"
 
 export const metadata: Metadata = {
   title: "İletişim",
@@ -91,6 +91,29 @@ export default async function ContactPage() {
                 </div>
 
                 <div>
+                  <dt className="text-sm text-ink/50">WhatsApp</dt>
+                  <dd className="mt-2 text-base">
+                    <a
+                      href={whatsappHref()}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group transition-colors duration-300 hover:text-olive"
+                    >
+                      WhatsApp’tan yazın
+                      <span
+                        aria-hidden="true"
+                        className="ml-2 inline-block transition-transform duration-300 group-hover:translate-x-1"
+                      >
+                        →
+                      </span>
+                    </a>
+                    <p className="mt-2 text-sm text-ink/50">
+                      Hafta içi 09:00–18:00 içinde dönüyoruz.
+                    </p>
+                  </dd>
+                </div>
+
+                <div>
                   <dt className="text-sm text-ink/50">E-posta</dt>
                   <dd className="mt-2 text-base">
                     <a
@@ -111,7 +134,7 @@ export default async function ContactPage() {
               <p className="mt-6 max-w-lg text-base leading-relaxed text-ink/65">
                 Formu doldurun, size aynı adresten dönelim. Hasat ve paketleme
                 günlerinde dönüş bir gün gecikebiliyor — acele bir konuysa
-                telefon daha hızlı.
+                WhatsApp daha hızlı.
               </p>
               <div className="mt-10">
                 <ContactForm />

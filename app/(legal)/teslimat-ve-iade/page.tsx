@@ -23,7 +23,7 @@ export default function Page() {
           <strong>Kargo süresi:</strong> Türkiye içi 2–5 iş günü (kargo yoğunluğuna göre değişir).
         </li>
         <li>
-          <strong>Kargo ücreti:</strong> 500 ₺ ve üzeri ücretsiz; altında 29,90 ₺. Kampanya döneminde değişiklik sitede
+          <strong>Kargo ücreti:</strong> 2000 ₺ ve üzeri ücretsiz; altında 29,90 ₺. Kampanya döneminde değişiklik sitede
           ilan edilir.
         </li>
         <li>

@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
+import Image from "next/image"
 import Link from "next/link"
 import { PageShell } from "@/components/layout/page-shell"
 import { journalEntries, type JournalEntry } from "@/content/journal"
@@ -84,6 +85,32 @@ export default async function JournalEntryPage({ params }: { params: Promise<{ s
             {entry.location}
           </p>
           <h1 className="mt-5 text-3xl leading-[1.12] tracking-tight md:text-4xl">{entry.observation}</h1>
+
+          {entry.photo && (
+            <figure className="mt-10">
+              <div className="relative aspect-[4/3] overflow-hidden rounded-media bg-paper">
+                <Image
+                  src={entry.photo}
+                  alt={`${formatEntryDate(entry.date)} — ${entry.location}`}
+                  fill
+                  sizes="(min-width: 768px) 42rem, 100vw"
+                  className="object-cover"
+                />
+              </div>
+            </figure>
+          )}
+
+          {entry.video && (
+            <figure className="mt-6">
+              <video
+                src={entry.video}
+                controls
+                playsInline
+                preload="none"
+                className="aspect-video w-full rounded-media bg-paper"
+              />
+            </figure>
+          )}
 
           <dl>
             <Field label="Hava" value={entry.weather} />

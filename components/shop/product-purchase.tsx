@@ -64,6 +64,7 @@ export function ProductPurchase({ product, image = product.mainImageUrl, selecte
                       disabled={sold}
                       onClick={() => setSelectedVariant(v.weight)}
                       aria-pressed={active}
+                      aria-label={sold ? `${v.weight} — tükendi` : undefined}
                       className={`min-h-11 rounded-theme-button border px-5 text-sm transition-colors duration-300 ${
                         active
                           ? "border-brand bg-brand text-on-brand"

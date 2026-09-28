@@ -157,7 +157,8 @@ const PRODUCT_LEAN_SELECT = `
   id, slug, name, base_price, main_image_url, source, certification,
   short_description, is_active, is_featured, created_at,
   rating_avg, rating_count,
-  category:categories(slug, name)
+  category:categories(slug, name),
+  producer:producers(slug, name)
 `
 
 // ---- async fetch functions (accept a server or browser client) ----
@@ -255,21 +256,59 @@ export const getCachedHomepageProducts = unstable_cache(fetchProductsUncached, [
   tags: ["catalog-homepage"],
 })
 
+async function fetchFeaturedFullUncached(): Promise<Product[]> {
+  const client = getAnonClient()
+  if (!client) throw new Error("Supabase env eksik — Vercel build env kontrol edin")
+  const { data, error } = await client
+    .from("products")
+    .select(PRODUCT_SELECT)
+    .eq("is_active", true)
+    .eq("is_featured", true)
+    .order("created_at", { ascending: true })
+  if (error || !data) return []
+  return data.map((row) => mapProduct(row as unknown as ProductRow, false))
+}
+
+/**
+ * Öne çıkanlar şeridi varyant ister (stok + ağırlık + sepete ekle id'si);
+ * lean satırlar yetmez. Stok bilinmiyorken "Stokta yok" yazmak yasaktır —
+ * o yüzden bu şerit tam satır okur.
+ */
+export const getCachedFeaturedFullProducts = unstable_cache(fetchFeaturedFullUncached, ["kabia-featured-full-v2"], {
+  revalidate: 300,
+  tags: ["catalog-featured"],
+})
+
 export async function fetchProductBySlug(
   client: SupabaseClient,
   slug: string,
 ): Promise<Product | null> {
+  // Yorumlar ana sorguya gömülü değil: reviews okuma izni kalkarsa (42501)
+  // bütün ürün sayfası 404'e düşüyordu. Ürün her zaman döner; yorumlar
+  // okunamazsa boş liste + log ile devam eder.
   const { data, error } = await client
     .from("products")
-    .select(
-      `${PRODUCT_SELECT}, reviews(id, reviewer_name, user_id, rating, review_text, is_verified_purchase, created_at)`,
-    )
+    .select(PRODUCT_SELECT)
     .eq("slug", slug)
     .eq("is_active", true)
-    .order("created_at", { referencedTable: "reviews", ascending: false })
     .maybeSingle()
   if (error || !data) return null
-  return mapProduct(data as unknown as ProductRow, true)
+  let reviews: unknown[] = []
+  try {
+    const res = await client
+      .from("reviews")
+      .select("id, reviewer_name, user_id, rating, review_text, is_verified_purchase, created_at")
+      .eq("product_id", (data as { id: string }).id)
+      .order("created_at", { ascending: false })
+    if (res.error) {
+      console.error(`[catalog] reviews okunamadı (${slug}):`, res.error.message)
+    } else {
+      reviews = res.data ?? []
+    }
+  } catch (e) {
+    console.error(`[catalog] reviews sorgusu çöktü (${slug}):`, e instanceof Error ? e.message : e)
+  }
+  return mapProduct({ ...(data as object), reviews } as unknown as ProductRow, true)
 }
 
 export async function fetchRelatedProducts(

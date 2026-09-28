@@ -11,6 +11,7 @@ import {
   SORT_OPTIONS,
 } from "@/lib/store-listing";
 import type { Product } from "@/lib/products";
+import { homeAnchor } from "@/lib/site";
 
 export type StoreSearch = {
   kategori?: string;
@@ -113,9 +114,9 @@ export function StoreListing({
             <p className="font-theme-display text-2xl italic text-clay">
               Ürünler şu anda yüklenemiyor.
             </p>
-            <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-ink/55">
-              Mağaza sayfası açık kalacak. Lütfen daha sonra yeniden deneyin.
-            </p>
+              <p className="mx-auto mt-4 max-w-sm text-sm leading-relaxed text-ink/55">
+                Mağaza açık kalacak. Lütfen daha sonra yeniden deneyin.
+              </p>
           </div>
         ) : products.length === 0 ? (
           <div className="py-24 text-center">
@@ -127,7 +128,13 @@ export function StoreListing({
                 ? "Yeni hasat yüklendiğinde ürünler burada listelenir."
                 : "Diğer kategorilere göz atabilirsiniz."}
             </p>
-            {all.length > 0 && (
+            {all.length === 0 ? (
+              <div className="mt-8">
+                <ArrowLink href={homeAnchor("#haber-ver")} prefetch={false}>
+                  Hasat açılınca haber ver
+                </ArrowLink>
+              </div>
+            ) : (
               <div className="mt-8">
                 <ArrowLink href={base} prefetch={false}>
                   Tüm ürünler

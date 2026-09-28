@@ -160,38 +160,46 @@ export function ReviewStep({
       <div className="mt-8 rounded-theme-card border border-ink/10 bg-paper p-5">
         <h2 className="label text-olive">Onaylar</h2>
         <div className="mt-4 space-y-4">
+          <p className="text-sm leading-relaxed text-ink/60">
+            Sözleşmeler:{" "}
+            <Link href={routes.distanceSalesAgreement} target="_blank" className="font-medium text-brand hover:text-forest underline underline-offset-4">
+              Mesafeli Satış Sözleşmesi
+            </Link>
+            {", "}
+            <Link href={routes.preliminaryInfo} target="_blank" className="font-medium text-brand hover:text-forest underline underline-offset-4">
+              Ön Bilgilendirme Formu
+            </Link>{" "}
+            ve{" "}
+            <Link href={routes.deliveryAndReturn} target="_blank" className="font-medium text-brand hover:text-forest underline underline-offset-4">
+              Teslimat ve İade Koşulları
+            </Link>
+            .
+          </p>
           <Checkbox
             label={
               <span className="text-sm leading-relaxed">
-                <Link href={routes.distanceSalesAgreement} target="_blank" className="font-medium text-brand hover:text-forest underline underline-offset-4">
-                  Mesafeli Satış Sözleşmesi
-                </Link>
-                ,{" "}
-                <Link href={routes.preliminaryInfo} target="_blank" className="font-medium text-brand hover:text-forest underline underline-offset-4">
-                  Ön Bilgilendirme Formu
-                </Link>{" "}
-                ve{" "}
-                <Link href={routes.deliveryAndReturn} target="_blank" className="font-medium text-brand hover:text-forest underline underline-offset-4">
-                  Teslimat ve İade Koşulları
-                </Link>
-                ’nı okudum, onaylıyorum. <span className="text-clay">*</span>
+                Yukarıdaki sözleşmeleri okudum, onaylıyorum. <span className="text-clay">*</span>
               </span>
             }
             checked={agreedSales}
             onChange={(e) => onAgreedSalesChange(e.target.checked)}
             aria-invalid={showError && !agreedSales ? true : undefined}
           />
+          <p className="text-sm leading-relaxed text-ink/60">
+            Gizlilik:{" "}
+            <Link href={routes.kvkkDisclosure} target="_blank" className="font-medium text-brand hover:text-forest underline underline-offset-4">
+              KVKK Aydınlatma Metni
+            </Link>{" "}
+            ve{" "}
+            <Link href={routes.privacyPolicy} target="_blank" className="font-medium text-brand hover:text-forest underline underline-offset-4">
+              Gizlilik Politikası
+            </Link>
+            .
+          </p>
           <Checkbox
             label={
               <span className="text-sm leading-relaxed">
-                <Link href={routes.kvkkDisclosure} target="_blank" className="font-medium text-brand hover:text-forest underline underline-offset-4">
-                  KVKK Aydınlatma Metni
-                </Link>{" "}
-                ve{" "}
-                <Link href={routes.privacyPolicy} target="_blank" className="font-medium text-brand hover:text-forest underline underline-offset-4">
-                  Gizlilik Politikası
-                </Link>
-                ’nı okudum, kişisel verilerimin siparişin yerine getirilmesi amacıyla işlenmesini onaylıyorum.{" "}
+                Yukarıdaki metinleri okudum, kişisel verilerimin siparişin yerine getirilmesi amacıyla işlenmesini onaylıyorum.{" "}
                 <span className="text-clay">*</span>
               </span>
             }

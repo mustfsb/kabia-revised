@@ -6,6 +6,7 @@ import { getPublishedTheme } from "@/lib/theme-settings";
 import { ALL_FONT_VARIABLES } from "@/lib/fonts";
 import { ThemeVars } from "@/components/theme/theme-vars";
 import { Providers } from "@/components/providers";
+import { WhatsAppFloat } from "@/components/layout/whatsapp-float";
 import { themeInitScript } from "@/lib/theme";
 import "./globals.css";
 
@@ -25,10 +26,43 @@ export async function generateMetadata(): Promise<Metadata> {
       template: `%s | ${settings.storeName}`,
     },
     description: settings.seoDefaultDescription,
-    alternates: { canonical: "/" },
+    keywords: [
+      "Kabia Ekolojik",
+      "organik badem",
+      "kabuklu badem",
+      "Marinada badem",
+      "doğal fındık",
+      "kabuklu fındık",
+      "kabuklu ceviz",
+      "ciğ badem",
+      "doğal bal",
+      "Kılıçkaya balı",
+      "ıhlamur",
+      "alıç sirkesi",
+      "elma sirkesi",
+      "domates salçası",
+      "erişte",
+      "tarhana",
+      "ekolojik tarım",
+      "organik tarım",
+      "Geyve",
+      "Sakarya",
+      "Kılıçkaya",
+    ],
+    authors: [{ name: "Kabia Ekolojik", url: site.url }],
+    creator: "Kabia Ekolojik",
+    publisher: "Epilantis Kozmetik Estetik Medikal Sanayi Dış Tic. Ltd. Şti.",
+    formatDetection: { email: false, address: false, telephone: false },
+    category: "organik gıda, ekolojik tarım",
+    classification: "Ekolojik Tarım, Organik Gıda",
+    alternates: {
+      canonical: "/",
+      languages: { "tr-TR": "/" },
+    },
     openGraph: {
       type: "website",
       locale: "tr_TR",
+      alternateLocale: ["en_US"],
       url: site.url,
       siteName: settings.storeName,
       title: settings.seoDefaultTitle,
@@ -47,13 +81,22 @@ export async function generateMetadata(): Promise<Metadata> {
       title: settings.seoDefaultTitle,
       description: settings.seoDefaultDescription,
       images: [settings.seoSocialImage],
+      creator: "@kabiaekolojik",
     },
-    robots: { index: true, follow: true },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: { index: true, follow: true, "max-image-preview": "large", "max-snippet": -1, "max-video-preview": -1 },
+    },
+    verification: { google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION || undefined },
   };
 }
 
 export const viewport: Viewport = {
-  themeColor: "#f4f1e8",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f4f1e8" },
+    { media: "(prefers-color-scheme: dark)", color: "#12150f" },
+  ],
 };
 
 /** Organization data limited to facts from the existing Kabia project. */
@@ -73,7 +116,21 @@ const organizationJsonLd = {
     streetAddress: "Sabırlar",
     addressCountry: "TR",
   },
-  sameAs: [site.social.instagram, site.social.facebook, site.social.x],
+  sameAs: [site.social.instagram, site.social.facebook, site.social.x].filter(Boolean),
+};
+
+const websiteJsonLd = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: site.name,
+  url: site.url,
+  inLanguage: "tr-TR",
+  publisher: { "@type": "Organization", name: site.name, logo: { "@type": "ImageObject", url: `${site.url}/images/logo.svg` } },
+  potentialAction: {
+    "@type": "SearchAction",
+    target: `${site.url}/magaza?q={search_term_string}`,
+    "query-input": "required name=search_term_string",
+  },
 };
 
 export default async function RootLayout({
@@ -114,7 +171,16 @@ export default async function RootLayout({
           nonce={nonce}
           suppressHydrationWarning
         />
-        <Providers>{children}</Providers>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd) }}
+          nonce={nonce}
+          suppressHydrationWarning
+        />
+        <Providers>
+          {children}
+          <WhatsAppFloat />
+        </Providers>
       </body>
     </html>
   );

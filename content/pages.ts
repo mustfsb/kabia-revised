@@ -1,30 +1,10 @@
 /**
- * Static copy for the standalone brand pages (/kabia-standardi, /ciftlik)
+ * Static copy for the standalone brand page (/ciftlik)
  * and the soil section now living on /ciftlik. Same convention as
  * content/homepage.ts: every fact here is either taken directly from the
  * KABIA 2.0 brief's Appendix A copy blocks, or already established
  * elsewhere in this codebase (content/homepage.ts) — nothing invented.
  */
-
-export const kabiaStandard = {
-  eyebrow: "Kabia Standardı",
-  title: "Kabia'da ürün seçmek yalnızca tadına bakıp karar vermek değildir.",
-  criteria: [
-    "Üreticiyi tanıyoruz.",
-    "Üretim yerini biliyoruz.",
-    "Nasıl üretildiğini öğreniyoruz.",
-    "Kullanılan girdileri sorguluyoruz.",
-    "Mümkün olduğunda üretim alanını yerinde görüyoruz.",
-    "Gerekli durumlarda analiz / belge / sertifika bilgilerini değerlendiriyoruz.",
-    "Şeffaf olmayan ürünü seçmiyoruz.",
-  ],
-  closing: {
-    statementA: "Önce üretici.",
-    statementB: "Sonra ürün.",
-  },
-  note:
-    "“Kabia Seçki” ve “Kabia Mutfak” etiketleri Kabia'nın kendi seçme ve değerlendirme yaklaşımını ifade eder; resmî organik sertifikanın yerine geçmez. Organik sertifikalı ürünlerimiz ayrıca “Organik” olarak belirtilir.",
-} as const
 
 export const soil = {
   eyebrow: "Toprak",
@@ -52,8 +32,6 @@ export const farm = {
   stats: [
     { value: "19", label: "Dönüm" },
     { value: "946", label: "Badem ağacı" },
-    { value: "1", label: "Çiftlik" },
-    { value: "4", label: "Mevsim" },
   ],
   // Same six-step process already established on the homepage (content/homepage.ts → process),
   // reused here rather than re-described, since this page is specifically about the farm.

@@ -16,7 +16,7 @@ export default function Page() {
     >
       <h2>1. Veri sorumlusu</h2>
       <p>
-        <strong>Kabia Ekolojik Tarım Ürünleri</strong>
+        <strong>Epilantis Kozmetik Estetik Medikal Sanayi Dış Tic. Ltd. Şti.</strong>
         <br />
         Adres: Sabırlar Köyü, 54700 Geyve / Sakarya
         <br />

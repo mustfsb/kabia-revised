@@ -25,8 +25,9 @@ export default function Page() {
 
       <h2>2. Ürünün temel nitelikleri</h2>
       <p>
-        Kabia ekolojik bademleri Sakarya Geyve’de kimyasal gübre ve ilaç kullanılmadan yetiştirilir. Ürün adı, gramajı,
-        içeriği, alerjen uyarısı, son tüketim tarihi ve saklama koşulları ürün detay sayfasında ve etiketinde yer alır.
+        Kabia ekolojik ürünleri (kabuklu badem, fındık, ceviz, bal, ıhlamur ve mutfak ürünleri) Sakarya Geyve ve
+        çevresinde kimyasal gübre ve ilaç kullanılmadan, geleneksel yöntemlerle üretilir. Ürün adı, gramajı, içeriği,
+        alerjen uyarısı, son tüketim tarihi ve saklama koşulları ürün detay sayfasında ve etiketinde yer alır.
         Görseller temsilidir; hasat dönemine göre tane iriliği/doğal renk farklılıkları oluşabilir.
       </p>
 
@@ -45,7 +46,7 @@ export default function Page() {
           </tr>
           <tr>
             <td>Kargo</td>
-            <td>500 ₺ üzeri ücretsiz; altında 29,90 ₺ (kampanyaya göre değişebilir).</td>
+            <td>2000 ₺ üzeri ücretsiz; altında 29,90 ₺ (kampanyaya göre değişebilir).</td>
           </tr>
           <tr>
             <td>Toplam</td>

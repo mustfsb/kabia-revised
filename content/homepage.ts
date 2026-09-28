@@ -1,4 +1,4 @@
-import { anchors, routes, site } from "@/lib/site";
+import { anchors, site } from "@/lib/site";
 
 /**
  * All visible homepage copy lives here, in Turkish.
@@ -23,7 +23,7 @@ export const intro = {
     headlineB: "üretilenler.",
     supporting: "Kendi çiftliğimizden ve güvendiğimiz üreticilerden.",
     primaryCta: { label: "Çiftliği keşfet", href: anchors.farm },
-    secondaryCta: { label: "Seçkimizi gör", href: anchors.products },
+    secondaryCta: { label: "Seçki ve Mutfak", href: anchors.products },
   },
   /* First editorial beat, set in the secondary (serif italic) voice. */
   act2: {
@@ -46,13 +46,13 @@ export const intro = {
   },
   /** Brand word shown during the transition to the store. */
   transitionWord: "kabia",
-  transitionAnnouncement: "kabia — mağazaya yönlendiriliyorsunuz",
+  transitionAnnouncement: "kabia — üreticilerle tanışıyorsunuz",
 } as const;
 
 export const manifesto = {
   statementA: "Her ürünü biz üretmiyoruz.",
   statementB: "Neden seçtiğimizi biliyoruz.",
-  body: "Kendi çiftliğimizde badem yetiştiririz. Güvendiğimiz üreticilerden seçtiğimiz ürünleri bir araya getiririz. Az ama doğru üretmeyi tercih ediyoruz.",
+  body: "Kendi çiftliğimizde badem yetiştiririz. Güvendiğimiz üreticilerden seçtiğimiz ürünleri bir araya getiririz. Çok tonajlı üretim yerine temiz ve sağlıklı gıda üretmeyi tercih ediyoruz.",
 } as const;
 
 /**
@@ -74,14 +74,14 @@ export const products = {
     "Üreticilerin mutfağından.",
   ],
   intro:
-    "Kendi çiftliğimizden ve güvendiğimiz üreticilerden. Üç kaynak, üç ürün; tamamı mağazada.",
+    "Üç dünyadan birer tat — kendi bahçemizden, tanıdığımız üreticiden, üreticinin mutfağından.",
   entries: [
     {
       source: "ciftlik",
       sourceName: "Kabia Çiftliği",
       name: "Kabuklu Badem",
       slug: "kabuklu-badem",
-      image: "/images/kabia-badem.jpeg",
+      image: "/images/acik-badem.jpg",
       alt: "Kabia Çiftliği'nin kendi bahçesinden kabuklu badem",
     },
     {
@@ -89,7 +89,7 @@ export const products = {
       sourceName: "Kabia Seçki",
       name: "Kabuklu Fındık",
       slug: "findik-ici",
-      image: "/images/findik1.jpeg",
+      image: "/images/findik2.jpeg",
       alt: "Güvendiğimiz üreticiden gelen kabuklu fındık",
     },
     {
@@ -97,34 +97,32 @@ export const products = {
       sourceName: "Kabia Mutfak",
       name: "Tarhana",
       slug: "tarhana",
-      image: "/images/tarhana1.jpeg",
+      image: "/images/acik-tarhana1.jpg",
       alt: "Üreticinin mutfağında geleneksel yöntemle hazırlanan tarhana",
     },
   ],
 } as const;
 
 export const origin = {
-  title: "Çiftlik",
+  title: "Kılıçkaya’da bir bahçe.",
   eyebrow: "Sabırlar Köyü — Geyve, Sakarya",
   body: [
-    "Her şey bir badem bahçesinde başladı.",
-    "Geyve'nin Sabırlar köyünde 19 dönümlük bir bahçede, toprağı yalnızca ürün yetiştirilen bir alan olarak değil, yaşayan bir ekosistem olarak görerek üretmeye çalışıyoruz.",
-    "19 DÖNÜM · 946 BADEM AĞACI · 1 ÇİFTLİK · 4 MEVSİM",
+    "2019’da boş bir tarlayı dinlemeye geldik. Gerisini bahçe yazdı.",
   ],
   images: [
     {
       src: "/images/orchard-hillside.jpg",
       width: 2047,
       height: 2048,
-      alt: "Geyve sırtlarında genç badem bahçesi, arkada vadi ve dağlar",
-      caption: "Genç bahçe, Geyve sırtları. Ağaçlar vadiye bakar.",
+      alt: "Kılıçkaya yamaçlarında genç badem bahçesi, arkada vadi ve dağlar",
+      caption: "Badem ağaçları 3. yıl, Kılıçkaya yamaçları.",
     },
     {
-      src: "/images/field-tractor.jpg",
-      width: 1200,
-      height: 1600,
-      alt: "Badem bahçesinde traktör, arkada sisli dağlar",
-      caption: "Bahçe bakımı bize ait; işi yerinde, kendi makinemizle yaparız.",
+      src: "/images/gunluk-2026-09-13-catlak-kabuk.jpeg",
+      width: 1144,
+      height: 2040,
+      alt: "Dalında çatlamış yeşil kabuklu bademler — hasat zamanı",
+      caption: "Yeşil kabuk çatlayınca hasat başlar.",
     },
     {
       src: "/images/orchard-winter.jpg",
@@ -144,7 +142,7 @@ export const process = {
     {
       name: "Bahçe",
       description:
-        "Ağaçlar Geyve'nin yamaçlarında, kimyasal gübre ve ilaç kullanılmadan büyür.",
+        "Ağaçlar Kılıçkaya yamaçlarında, sentetik girdi kullanılmadan büyür.",
     },
     {
       name: "Hasat",
@@ -156,12 +154,11 @@ export const process = {
     },
     {
       name: "Kurutma",
-      description: "Bademler sert kabuğunda, kendi halinde kurumaya bırakılır.",
+      description: "Sert kabuğunda, gölgeli rüzgar alan yerde kurur.",
     },
     {
       name: "Hazırlık",
-      description:
-        "Çiğ, kavrulmuş ya da ezme — hangi ürün olacaksa katkısız hazırlanır.",
+      description: "Kabuklu halde, katkısız hazırlanır.",
     },
     {
       name: "Sofra",
@@ -174,28 +171,35 @@ export const principles = {
   title: "Yaklaşım",
   items: [
     {
-      name: "Kimyasalsız bahçe",
+      name: "Bilinen kaynak",
       description:
-        "Kendi bahçemizde kimyasal gübre ve ilaç kullanmıyoruz. Ekolojik tarım bizim için bir etiket değil, çalışma biçimi.",
+        "Sabırlar Köyü — Kılıçkaya Vadisi, kendi bahçemiz. Toprağı sürmüyor, biçmiyor, dışarıdan gübre almıyoruz.",
     },
     {
-      name: "Katkısız ürün",
+      name: "Üreticisi tanınan ürün",
       description:
-        "Ürünlerimize katkı maddesi eklemeyiz — kendi ürettiklerimizde de, seçtiğimiz üreticilerin ürünlerinde de.",
+        "Engin Abi’nin fındığı, Kayadibi’nin cevizi, Akıncı’nın ıhlamuru — her ürünün arkasında tanıdığımız bir insan var.",
     },
     {
-      name: "Üreticiyi tanırız",
+      name: "Katkısız",
       description:
-        "Sattığımız her ürünün nereden, nasıl ve kim tarafından üretildiğini biliriz.",
+        "Sertifikalı olsa bile dışarıdan gübre yok; ürüne ek katkı maddesi yok. Ne uyguluyorsak onu yazıyoruz.",
     },
   ],
 } as const;
 
+export const emanet = {
+  eyebrow: "Emanet",
+  titleA: "Toprağı emanet",
+  titleB: "gibi görüyoruz.",
+  body: "Bu toprak bize ait değil, bizden sonrakilere bırakacağımız bir emanet. Hızlı değil, doğru ve kalıcı üretmek istiyoruz. Her hasat, bir sonraki yılın toprağına bırakılan nottur.",
+} as const;
+
 export const editorialImage = {
-  src: "/images/almonds-drying.jpg",
-  width: 2200,
-  height: 1466,
-  alt: "Hasat edilmiş kabuklu bademler, sepetin yanında yığın halinde kuruyor",
+  src: "/images/kilimbadem.jpg",
+  width: 1672,
+  height: 941,
+  alt: "Kilim üzerinde kurumaya serilmiş kabuklu bademler",
   caption: "Hasat sonrası. Bademler kabuğunda, kendi halinde kurur.",
 } as const;
 
@@ -204,18 +208,17 @@ export const editorialImage = {
  * about section — not a fabricated testimonial.
  */
 export const quote = {
-  text: "Doğanın bize sunduğu en değerli hediyelerden biri olan bademi, en saf ve doğal haliyle sizlere ulaştırıyoruz.",
+  text: "Kendi soframıza koymayacağımızı, sizin sofranıza göndermiyoruz.",
   attribution: "Kabia Ekolojik",
-  context: "Kuruluş metninden",
+  context: "Kabia sofrası ilkesi",
 } as const;
 
 export const finalCta = {
   titleA: "Toprakla başlayan",
   titleB: "bir hikâye.",
-  body: "Kendi çiftliğimizden ve güvendiğimiz üreticilerden.",
-  cta: { label: "Mağazaya Git", href: routes.store },
+  body: "Sorun, önerin — bahçeden biri okuyor, hafta içi dönüyoruz.",
   image: {
-    src: "/images/almonds-net.jpg",
+      src: "/images/file-badem.jpg",
     alt: "File içinde kabuklu Kabia bademleri",
   },
 } as const;

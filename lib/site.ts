@@ -12,6 +12,8 @@ export const site = {
   email: "info@kabia.com",
   phone: "+90 553 744 76 74",
   phoneHref: "tel:+905537447674",
+  /* WhatsApp Business hattı: telefonla aynı numara, tek hat karışmaz. */
+  whatsappNumber: "905537447674",
   address: "Sabırlar, 54700 Geyve / Sakarya",
   region: "Geyve, Sakarya",
   social: {
@@ -20,6 +22,14 @@ export const site = {
     x: "https://x.com/kabiaekolojik",
   },
 } as const;
+
+/** Hazır mesajlı WhatsApp sohbet linki — boş sohbet insanlara zor gelir. */
+const WHATSAPP_DEFAULT_MESSAGE =
+  "Merhaba, Kabia ürünleri hakkında bilgi almak istiyorum.";
+
+export function whatsappHref(message: string = WHATSAPP_DEFAULT_MESSAGE) {
+  return `https://wa.me/${site.whatsappNumber}?text=${encodeURIComponent(message)}`;
+}
 
 /**
  * In-page anchors on the homepage. These only resolve on `/`, so navigation
@@ -47,8 +57,24 @@ export const routes = {
   // The Seçki grid is the brand-facing entry to the producers; /ureticiler
   // stays as it is and remains the story route that Seçki links into.
   secki: "/secki",
-  producerStore: (slug: string) => `/magaza/${slug}`,
-  kabiaStandard: "/kabia-standardi",
+  mutfak: "/mutfak",
+  // Producer slugs are story slugs, not product slugs: /magaza/<producer>
+  // has no route and 404s. Map each producer to its real product instead —
+  // the single source is the shop catalogue, keyed by product slug.
+  producerProduct: {
+    "kabia-ciftligi": "kabuklu-badem",
+    "geyce-setce-findik": "findik-ici",
+    "ege-ceviz": "ceviz-ici",
+    "anadolu-bal": "cicek-bali",
+    "akinci-ihlamur": "ihlamur",
+    "domates-salcasi": "domates-salcasi",
+    "elma-sirkesi": "elma-sirkesi",
+    "alic-sirkesi": "alic-sirkesi",
+    "eriste": "eriste",
+    "tarhana": "tarhana",
+  } as Record<string, string>,
+  producerStore: (slug: string) =>
+    `/shop/${routes.producerProduct[slug] ?? slug}`,
   journal: "/gunluk",
   journalEntry: (slug: string) => `/gunluk/${slug}`,
   farm: "/ciftlik",
