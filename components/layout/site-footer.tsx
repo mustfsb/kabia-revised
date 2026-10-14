@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { anchors, homeAnchor, legalLinks, routes } from "@/lib/site";
+import { anchors, homeAnchor, legalLinks, routes, whatsappHref } from "@/lib/site";
 import { getPublicSettings } from "@/lib/settings";
 
 /* Lucide dropped brand icons; these are minimal inline equivalents. */
@@ -42,20 +42,21 @@ function XIcon(props: React.SVGProps<SVGSVGElement>) {
 const shopItems = [
   { label: "Mağaza", href: routes.store },
   { label: "Seçki", href: routes.secki },
+  { label: "Mutfak", href: routes.mutfak },
   { label: "Üreticiler", href: routes.producers },
-  { label: "Kabia Standardı", href: routes.kabiaStandard },
 ];
 
 const farmItems = [
-  { label: "Çiftliğimiz", href: homeAnchor(anchors.farm) },
-  { label: "Bahçeyi keşfet", href: routes.farm },
+  { label: "Çiftliğimiz", href: routes.farm },
   { label: "Yaklaşım", href: routes.farmApproach },
+  { label: "Emanet", href: `${routes.farm}#emanet` },
+  { label: "Sertifika", href: `${routes.farm}#sertifika` },
+  { label: "Saha Notları", href: routes.journal },
 ];
 
 const supportItems = [
   { label: "Sepet", href: routes.cart },
   { label: "Hesabım", href: routes.account },
-  { label: "Günlük", href: routes.journal },
   { label: "İletişim", href: routes.contact },
 ];
 
@@ -112,6 +113,16 @@ export async function SiteFooter() {
                   className="hover:text-ink transition-colors duration-300"
                 >
                   {settings.supportPhone}
+                </a>
+              </p>
+              <p>
+                <a
+                  href={whatsappHref()}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-ink transition-colors duration-300"
+                >
+                  WhatsApp’tan yazın
                 </a>
               </p>
               {settings.supportHours && (

@@ -4,12 +4,14 @@ import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
-import { Star } from "lucide-react";
+import { Check, ShoppingBag, Star } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { TextField, TextAreaField } from "@/components/ui/field";
 import { ProductEntry } from "@/components/shop/product-entry";
 import { ProductPurchase } from "@/components/shop/product-purchase";
+import { useCart } from "@/lib/cart-context";
+import { useAuth } from "@/lib/auth-context";
 import { isPreviewItem } from "@/lib/preview-identity";
 import {
   formatTL,
@@ -25,25 +27,16 @@ import { EASE } from "@/lib/motion";
 import { STOCK_BADGE_STYLE } from "@/lib/theme-engine/stock-badge-style";
 
 /**
- * The last two rows named a single farm/product ("Geyve, Sabırlar" / "Yalnızca
- * badem") — accurate for Çiftlik products, but wrong once Seçki/Mutfak
- * products (other regions, other goods) exist. Source-aware so the claim
- * stays true for every product line.
+ * Tek tip: tüm ürünlerde aynı iki satır. Üretici ayrımı hikaye
+ * kartlarında ve menşei satırında yaşar; garanti kutusu marka sözüdür.
  */
-function guarantees(source: Product["source"]) {
-  const originGuarantee =
-    source === "ciftlik"
-      ? { label: "Tek kaynak", detail: "Geyve, Sabırlar" }
-      : { label: "Bilinen kaynak", detail: "Üreticisi tanınan ürün" };
-  const additiveGuarantee =
-    source === "ciftlik"
-      ? { label: "Katkısız", detail: "Yalnızca badem" }
-      : { label: "Katkısız", detail: "Ek katkı maddesi yok" };
+function guarantees(_product: Product) {
   return [
-    { label: "Ücretsiz kargo", detail: "500₺ üzeri siparişlerde" },
+    // Kargo ücreti lib/cart-context SHIPPING_COST ile aynı olmalı (şu an 107,91₺ HepsiJet).
+    { label: "Ücretsiz kargo", detail: "2000₺ üzeri ücretsiz, altı ₺107,91" },
     { label: "15 gün iade", detail: "Açılmamış ürünlerde" },
-    originGuarantee,
-    additiveGuarantee,
+    { label: "Tek kaynak", detail: "Kabia Ekolojik" },
+    { label: "Katkısız", detail: "Koruyucu ve katkı maddesi içermez" },
   ];
 }
 
@@ -56,20 +49,18 @@ function guarantees(source: Product["source"]) {
  * stands alone up in the purchase area; this row never qualifies it.
  */
 function certificationRow(product: Product): ReactNode {
+  // Ürüne özel sertifika metni (3000 dili) önde: "Sertifikasız — organik
+  // sertifikası bulunmamaktadır. Doğal üretim, ..." — boşsa standart etiket.
+  if (product.certificates) {
+    return product.certificates;
+  }
   if (isOrganicCertified(product.certification)) {
     return CERTIFICATION_LABEL[product.certification];
   }
   return (
     <span>
       {CERTIFICATION_LABEL[product.certification]} — Kabia&rsquo;nın kendi
-      seçim standardı.{" "}
-      <Link
-        href={routes.kabiaStandard}
-        prefetch={false}
-        className="underline decoration-brand decoration-2 underline-offset-4"
-      >
-        Kabia Standardı nedir?
-      </Link>
+      seçim standardı.
     </span>
   );
 }
@@ -115,8 +106,10 @@ function productDetailRows(product: Product): [string, ReactNode][] {
     ["Alerjenler", product.allergens],
     ["Net ağırlık", product.netWeight],
   ];
+  // Tek satır: serbest-metin "Sertifikalar" satırı enum satırını tekrar
+  // ediyordu (Sertifikalar/Sertifika yan yana kafa karıştırıyordu).
+  // Ürüne özel notlar description/productionMethod içinde zaten yaşıyor.
   const certs: [string, ReactNode][] = [
-    ["Sertifikalar", product.certificates],
     ["Sertifika", certificationRow(product)],
   ];
   return product.source === "mutfak"
@@ -176,6 +169,30 @@ export function ProductDetail({
 }) {
   const preview = isPreviewItem(product);
   const reviewsRef = useRef<HTMLDivElement>(null);
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  const visibleTabs = preview ? TABS.slice(0, 1) : TABS;
+
+  const focusTab = (index: number) => {
+    const next = (index + visibleTabs.length) % visibleTabs.length;
+    setActiveTab(visibleTabs[next].id);
+    tabRefs.current[next]?.focus();
+  };
+
+  const onTabKeyDown = (event: React.KeyboardEvent, index: number) => {
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      focusTab(index + 1);
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      focusTab(index - 1);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      focusTab(0);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      focusTab(visibleTabs.length - 1);
+    }
+  };
 
   const galleryImages = useMemo(
     () => (product.images.length ? product.images : [product.mainImageUrl]),
@@ -218,9 +235,9 @@ export function ProductDetail({
           </li>
           <li aria-hidden="true">·</li>
           <li>
-            <Link href={routes.store} className="transition-colors hover:text-ink">
-              Mağaza
-            </Link>
+              <Link href={routes.store} className="transition-colors hover:text-ink">
+                Mağaza
+              </Link>
           </li>
           <li aria-hidden="true">·</li>
           <li className="text-ink/80">{product.name}</li>
@@ -341,8 +358,8 @@ export function ProductDetail({
 
           <ProductPurchase product={product} image={image} selectedWeight={selectedVariant} onWeightChange={setSelectedVariant} />
 
-          {!preview && <dl className="mt-12 grid grid-cols-2 border-t border-ink/10">
-            {guarantees(product.source).map((g) => (
+          {!preview && <dl className="mt-12 grid grid-cols-1 border-t border-ink/10 min-[480px]:grid-cols-2">
+            {guarantees(product).map((g) => (
               <div key={g.label} className="border-b border-ink/10 py-4 pr-4">
                 <dt className="text-sm text-ink">{g.label}</dt>
                 <dd className="mt-1 text-xs text-ink/50">{g.detail}</dd>
@@ -355,18 +372,23 @@ export function ProductDetail({
       {/* Tabs */}
       <div className="mt-20 md:mt-28" ref={reviewsRef}>
         <div className="border-b border-ink/10">
-          <div role="tablist" aria-label="Ürün bilgileri" className="flex flex-wrap gap-8">
-            {(preview ? TABS.slice(0, 1) : TABS).map((tab) => {
+          <div role="tablist" aria-label="Ürün bilgileri" className="flex flex-wrap gap-x-8 gap-y-2">
+            {visibleTabs.map((tab, index) => {
               const active = tab.id === activeTab;
               return (
                 <button
                   key={tab.id}
                   type="button"
                   role="tab"
+                  ref={(el) => {
+                    tabRefs.current[index] = el;
+                  }}
+                  tabIndex={active ? 0 : -1}
                   id={`tab-${tab.id}`}
                   aria-selected={active}
                   aria-controls={`panel-${tab.id}`}
                   onClick={() => setActiveTab(tab.id)}
+                  onKeyDown={(event) => onTabKeyDown(event, index)}
                   className={`-mb-px min-h-12 border-b-2 text-sm transition-colors duration-300 ${
                     active
                       ? "border-brand text-ink"
@@ -395,10 +417,10 @@ export function ProductDetail({
                 {productDetailRows(product)
                   .filter(([, value]) => !!value)
                   .map(([label, value]) => (
-                    <div
-                      key={label}
-                      className="grid grid-cols-[10rem_1fr] gap-4 border-b border-ink/10 py-4"
-                    >
+              <div
+                key={label}
+                className="grid grid-cols-1 gap-1 border-b border-ink/10 py-4 sm:grid-cols-[10rem_1fr] sm:gap-4"
+              >
                       <dt className="label text-olive">{label}</dt>
                       <dd className="text-sm text-ink/70">{value}</dd>
                     </div>
@@ -483,7 +505,89 @@ export function ProductDetail({
           </ul>
         </section>
       )}
+
+      {/* Mobile sticky buy bar (below md only) + spacer so the footer
+          stays reachable above it. Same gating as the in-flow panel. */}
+      <StickyBuyBar product={product} image={image} selectedWeight={selectedVariant} />
     </div>
+  );
+}
+
+/**
+ * Mobile-only sticky buy bar: name + live price + add-to-cart.
+ * Mirrors ProductPurchase gating (hydration, preview, stock) so the two
+ * can never disagree about whether buying is possible.
+ */
+function StickyBuyBar({
+  product,
+  image,
+  selectedWeight,
+}: {
+  product: Product;
+  image: string;
+  selectedWeight?: string;
+}) {
+  const { addItem, hydrated: cartHydrated } = useCart();
+  const { userId, hydrated: authHydrated } = useAuth();
+  const [added, setAdded] = useState(false);
+  const preview = isPreviewItem(product);
+  const variant =
+    product.variants.find((v) => v.weight === (selectedWeight ?? product.defaultWeight)) ??
+    product.variants[0];
+  const available = !!variant && variant.stock > 0;
+  const blocked = !available || !cartHydrated || (preview && (!authHydrated || !!userId));
+
+  const handleAdd = () => {
+    if (!variant || !available) return;
+    const accepted = addItem({
+      id: `${product.slug}__${variant.weight}`,
+      slug: product.slug,
+      name: product.name,
+      variant: variant.weight,
+      price: variant.price,
+      image,
+      quantity: 1,
+      variantId: variant.id,
+      productId: product.id,
+    });
+    if (!accepted) return;
+    setAdded(true);
+    setTimeout(() => setAdded(false), 1500);
+    toast.success(`Sepete eklendi — ${product.name}, ${variant.weight}`, {
+      action: { label: "Sepete git", onClick: () => (window.location.href = routes.cart) },
+    });
+  };
+
+  return (
+    <>
+      <div aria-hidden="true" className="h-20 md:hidden" />
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-ink/10 bg-paper/95 backdrop-blur-sm md:hidden">
+        <div
+          className="flex items-center gap-3 px-4 pt-3"
+          style={{ paddingBottom: "calc(0.75rem + env(safe-area-inset-bottom))" }}
+        >
+          <div className="min-w-0 flex-1">
+            <p className="truncate text-sm font-medium text-ink">{product.name}</p>
+            <p className="figure mt-0.5 text-base text-ink">
+              {variant ? formatTL(variant.price) : "—"}
+            </p>
+          </div>
+          <Button onClick={handleAdd} disabled={blocked} size="lg" className="shrink-0">
+            {added ? (
+              <>
+                <Check className="h-4 w-4" aria-hidden="true" /> Eklendi
+              </>
+            ) : available ? (
+              <>
+                <ShoppingBag className="h-4 w-4" aria-hidden="true" /> Sepete ekle
+              </>
+            ) : (
+              "Stokta yok"
+            )}
+          </Button>
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -602,14 +706,19 @@ function ReviewsPanel({ product }: { product: Product }) {
               />
               <fieldset>
                 <legend className="label text-olive">Puanınız</legend>
-                <div className="mt-3 flex gap-1">
+                <div
+                  className="mt-3 flex gap-1"
+                  role="radiogroup"
+                  aria-label="Puanınız"
+                >
                   {Array.from({ length: 5 }).map((_, i) => (
                     <button
                       type="button"
                       key={i}
                       onClick={() => setFormRating(i + 1)}
+                      role="radio"
+                      aria-checked={formRating === i + 1}
                       aria-label={`${i + 1} yıldız`}
-                      aria-pressed={formRating === i + 1}
                       className="flex h-11 w-11 items-center justify-center"
                     >
                       <Star

@@ -39,7 +39,7 @@ export function LegalLayout({
             <div className="mt-12 rounded-theme-card border border-ink/10 bg-paper p-5 text-sm leading-relaxed text-ink/60">
               <p className="font-medium text-ink">Satıcı bilgileri</p>
               <p className="mt-2">
-                <strong className="text-ink">Unvan:</strong> Kabia Ekolojik Tarım Ürünleri · Sakarya Geyve
+                <strong className="text-ink">Unvan:</strong> Epilantis Kozmetik Estetik Medikal Sanayi Dış Tic. Ltd. Şti.
                 <br />
                 <strong className="text-ink">Adres:</strong> {site.address}
                 <br />
@@ -53,7 +53,7 @@ export function LegalLayout({
                   {site.phone}
                 </a>
                 <br />
-                <strong className="text-ink">MERSİS / KEP / ETBİS:</strong> ETBİS kaydımız için{" "}
+                <strong className="text-ink">MERSİS / KEP / ETBİS:</strong> ETBİS kaydımız Epilantis Kozmetik Estetik Medikal Sanayi Dış Tic. Ltd. Şti. adına kayıtlıdır;{" "}
                 <a
                   href="https://www.eticaret.gov.tr"
                   target="_blank"

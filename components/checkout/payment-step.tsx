@@ -9,6 +9,7 @@ import {
   formatCardNumber,
   formatExpiry,
   isPaymentValid,
+  paymentFieldErrors,
 } from "./validation";
 import type { PaymentData, PaymentMethod } from "./types";
 
@@ -30,6 +31,7 @@ export function PaymentStep({
 }) {
   const [cvvFocused, setCvvFocused] = useState(false);
   const valid = isPaymentValid(payment);
+  const fieldErrors = paymentFieldErrors(payment);
   const set = (patch: Partial<PaymentData>) =>
     onPaymentChange({ ...payment, ...patch });
 
@@ -72,6 +74,7 @@ export function PaymentStep({
               value={payment.cardName}
               onChange={(e) => set({ cardName: e.target.value })}
               autoComplete="cc-name"
+              error={fieldErrors.cardName}
               required
             />
             <TextField
@@ -84,6 +87,7 @@ export function PaymentStep({
               autoComplete="cc-number"
               placeholder="0000 0000 0000 0000"
               className="figure"
+              error={fieldErrors.cardNumber}
               required
             />
             <div className="grid grid-cols-2 gap-6">
@@ -95,6 +99,7 @@ export function PaymentStep({
                 autoComplete="cc-exp"
                 placeholder="MM/YY"
                 className="figure"
+                error={fieldErrors.expiry}
                 required
               />
               <TextField
@@ -107,6 +112,7 @@ export function PaymentStep({
                 autoComplete="cc-csc"
                 placeholder="000"
                 className="figure"
+                error={fieldErrors.cvv}
                 required
               />
             </div>

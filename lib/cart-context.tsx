@@ -33,8 +33,9 @@ const CartContext = createContext<CartContextValue | null>(null)
 
 const STORAGE_KEY = "kabia_cart"
 
-export const FREE_SHIPPING_THRESHOLD = 500
-export const SHIPPING_COST = 29.9
+export const FREE_SHIPPING_THRESHOLD = 2000
+// HepsiJet anlaşması: 4 desiye kadar sabit ücret. Değişirse tek yerden değişir.
+export const SHIPPING_COST = 107.91
 
 const CART_SELECT =
   "id, quantity, variant_id, product_id, product_variants(label, price), products(slug, name, main_image_url)"

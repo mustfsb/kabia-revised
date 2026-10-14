@@ -84,7 +84,7 @@ export function ProductCollection() {
         </ul>
 
         <Reveal className="mt-14 border-t border-ink/10 pt-7">
-          <ArrowLink href={routes.store}>Tüm ürünleri gör</ArrowLink>
+          <ArrowLink href={routes.store}>Mağazayı gör</ArrowLink>
         </Reveal>
       </div>
     </section>

@@ -51,8 +51,8 @@ export type ProductCertification = "organik_sertifikali" | "kabia_secki" | "kabi
 
 export const CERTIFICATION_LABEL: Record<ProductCertification, string> = {
   organik_sertifikali: "Organik Sertifikalı",
-  kabia_secki: "Kabia Seçki Standardı",
-  kabia_mutfak: "Kabia Mutfak Standardı",
+  kabia_secki: "Kabia Seçki",
+  kabia_mutfak: "Kabia Mutfak",
 }
 
 /** Whether this certification value may be described as organic anywhere in the UI. */

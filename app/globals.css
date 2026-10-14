@@ -108,7 +108,7 @@
   --surface: #f4f1e8;
   --surface-raised: #eae5d8;
   --text: #1c201b;
-  --text-muted: #77806f;
+  --text-muted: #5f6659;
   --brand: #147b4b;
   --accent: #c29a63;
   --alarm: #a4442f;
@@ -149,6 +149,30 @@
   --accent: #d0a870;
   --alarm: #e0705a;
   --grain-opacity: 0.03;
+}
+
+/* Koyu zeminde dolgu yüzeyler: --brand metin ve vurgularda açık kalır,
+   ama dolgu altında krem yazı 4.5:1'i tutturamaz. #1e7a4e tutturur (~4.7).
+   Katmansız yazıldığı için Tailwind'in katmanlı .bg-brand'ini ezer. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .bg-brand {
+    background-color: #1e7a4e;
+  }
+}
+:root[data-theme="dark"] .bg-brand {
+  background-color: #1e7a4e;
+}
+
+/* Koyu zeminde fotoğraflar kısılır: aydınlık kağıt için çekilmiş kareler
+   siyah üstünde parlar. Yalnızca object-cover kadrajlar etkilenir; belge,
+   logo ve kapak görselleri tam parlak kalır. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) img[class*="object-cover"] {
+    filter: brightness(0.92);
+  }
+}
+:root[data-theme="dark"] img[class*="object-cover"] {
+  filter: brightness(0.92);
 }
 
 

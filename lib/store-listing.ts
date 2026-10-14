@@ -1,4 +1,5 @@
 import { ALL_CATEGORIES, SOURCES, type Product } from "@/lib/products";
+import { orderOf } from "@/lib/shop-badges";
 
 export const SORT_OPTIONS = [
   { id: "onerilen", label: "Varsayılan" },
@@ -18,7 +19,8 @@ export function selectProducts(
       (source === "tumu" || source === p.source),
   );
   if (sort === "fiyat-artan") filtered.sort((a, b) => a.price - b.price);
-  if (sort === "fiyat-azalan") filtered.sort((a, b) => b.price - a.price);
+  else if (sort === "fiyat-azalan") filtered.sort((a, b) => b.price - a.price);
+  else filtered.sort((a, b) => orderOf(a.slug) - orderOf(b.slug));
   return filtered;
 }
 

@@ -61,7 +61,7 @@ export function CartPage() {
           Sepetiniz <em className="font-serif italic text-brand">boş</em>.
         </h1>
         <p className="mt-6 max-w-sm text-base leading-relaxed text-ink/60">
-          Bu sezonun bademleri mağazada. Bir ürün ekleyince burada görünür.
+          Mağazadan seçtikleriniz burada birikir.
         </p>
         <ButtonLink href={routes.store} className="mt-9">
           Mağazaya git

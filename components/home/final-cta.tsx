@@ -1,6 +1,6 @@
 import Image from "next/image";
 import { finalCta } from "@/content/homepage";
-import { site } from "@/lib/site";
+import { site, whatsappHref } from "@/lib/site";
 import { Reveal } from "@/components/motion/reveal";
 
 /** Closing conversion moment doubling as the contact section. */
@@ -25,12 +25,30 @@ export function FinalCta() {
             <p className="mt-6 max-w-md text-sm leading-relaxed text-cream/65 md:text-base">
               {finalCta.body}
             </p>
-            <a
-              href={finalCta.cta.href}
-              className="mt-9 inline-block rounded-theme-button bg-cream px-8 py-4 text-sm font-medium text-forest transition-colors duration-300 hover:bg-ivory"
-            >
-              {finalCta.cta.label}
-            </a>
+            {/* Bu bölüm iletişimin ta kendisi (id="iletisim"): tek işi konuşmaya
+                çağırmak. Mağaza isteği bir üstteki şeritte zaten söylendi. */}
+            <div className="mt-9 flex flex-wrap items-center gap-x-6 gap-y-3">
+              <a
+                href={site.phoneHref}
+                className="inline-flex min-h-11 items-center rounded-theme-button bg-cream px-8 text-sm font-medium text-forest transition-colors duration-300 hover:bg-ivory"
+              >
+                {site.phone}
+              </a>
+              <a
+                href={whatsappHref()}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group inline-flex min-h-11 items-center gap-2 text-sm text-cream/75 transition-colors duration-300 hover:text-cream"
+              >
+                WhatsApp’tan yazın
+                <span
+                  aria-hidden="true"
+                  className="inline-block transition-transform duration-300 group-hover:translate-x-1"
+                >
+                  →
+                </span>
+              </a>
+            </div>
             <address className="mt-12 space-y-2 text-sm not-italic text-cream/60">
               <p>{site.address}</p>
               <p>

@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { origin } from "@/content/homepage";
 import { Reveal } from "@/components/motion/reveal";
+import { ArrowLink } from "@/components/ui/button";
+import { routes } from "@/lib/site";
 
 /**
  * Documentary farm section: sticky editorial text beside a slow column of
@@ -33,6 +35,9 @@ export function OriginStory() {
                     {paragraph}
                   </p>
                 ))}
+                <div className="mt-7">
+                  <ArrowLink href={routes.farm}>Çiftliği gör</ArrowLink>
+                </div>
               </Reveal>
             </div>
           </div>

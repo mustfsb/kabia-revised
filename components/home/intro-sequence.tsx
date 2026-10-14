@@ -162,6 +162,14 @@ function EditorialBeat({ kicker, text }: { kicker: string; text: string }) {
  */
 function StageBackdrop({ active }: { active: boolean }) {
   const videoRef = useRef<HTMLVideoElement>(null);
+  // Veri tasarrufu isteyen cihaza 3 MB video indirtmeyiz: poster kare
+  // zaten videonun ilk karesi olduğu için geçiş fark edilmez.
+  const [saveData, setSaveData] = useState(false);
+  useEffect(() => {
+    const conn = (navigator as Navigator & { connection?: { saveData?: boolean } })
+      .connection;
+    if (conn?.saveData) setSaveData(true);
+  }, []);
 
   useEffect(() => {
     const el = videoRef.current;
@@ -175,20 +183,36 @@ function StageBackdrop({ active }: { active: boolean }) {
     }
   }, [active]);
 
+  if (saveData) {
+    return (
+      <div aria-hidden="true" className="absolute inset-0 z-0 overflow-hidden">
+        <img
+          src={HERO_POSTER}
+          alt=""
+          className="h-full w-full object-cover"
+        />
+        <div className="absolute inset-0 bg-forest/20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-forest/55 via-transparent to-forest/65" />
+      </div>
+    );
+  }
+
   return (
     <div aria-hidden="true" className="absolute inset-0 z-0 overflow-hidden">
       <video
         ref={videoRef}
         className="h-full w-full object-cover"
-        src={HERO_VIDEO}
         poster={HERO_POSTER}
         autoPlay
         muted
         loop
         playsInline
-        preload="auto"
+        preload="metadata"
         disablePictureInPicture
-      />
+      >
+        <source src="/video/kabia-hero-mobile.mp4" media="(max-width: 768px)" type="video/mp4" />
+        <source src={HERO_VIDEO} media="(min-width: 769px)" type="video/mp4" />
+      </video>
       <div className="absolute inset-0 bg-forest/20" />
       <div className="absolute inset-0 bg-gradient-to-b from-forest/55 via-transparent to-forest/65" />
     </div>
@@ -237,14 +261,6 @@ function QuietIntro() {
             <br />
             {intro.final.statementB}
           </p>
-          <div className="mt-10 md:mt-14">
-            <Link
-              href={routes.store}
-              className="inline-block rounded-theme-button bg-on-brand px-10 py-4 text-sm font-medium text-forest transition-colors duration-300 hover:bg-cream"
-            >
-              {intro.final.ctaLabel}
-            </Link>
-          </div>
         </div>
       </div>
     </section>
@@ -477,10 +493,11 @@ function ScrollIntro() {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
     e.preventDefault();
     if (veilPhase !== "off") return;
+    // "Önce üretici": the veil lifts onto the producers strip, not the store.
     setVeilPhase("enter");
     timers.current.push(window.setTimeout(() => setVeilPhase("settle"), 1250));
     timers.current.push(
-      window.setTimeout(() => router.push(routes.store), 1700),
+      window.setTimeout(() => router.push("/#ureticiler"), 1700),
     );
   };
 
@@ -491,7 +508,7 @@ function ScrollIntro() {
            lands its atmosphere, then hands the visitor to the products
            instead of dwelling on the same feeling twice. */}
       <div ref={wrapperRef} className="relative h-[280vh] md:h-[300vh]">
-        <div ref={stageRef} className="sticky top-0 h-screen overflow-hidden">
+        <div ref={stageRef} className="sticky top-0 h-dvh overflow-hidden">
           <StageBackdrop active={inView} />
 
           {/* The ground the film closes onto — a plain panel, so once the
@@ -608,21 +625,6 @@ function ScrollIntro() {
                 />
               </span>
             </p>
-            <motion.div
-              style={{ opacity: ctaOpacity, y: ctaY }}
-              className="mt-10 md:mt-14"
-            >
-              <a
-                href={routes.store}
-                onClick={onKesfet}
-                tabIndex={ctaHot ? 0 : -1}
-                className={`inline-block rounded-theme-button bg-on-brand px-10 py-4 text-sm font-medium text-forest transition-colors duration-300 hover:bg-cream ${
-                  ctaHot ? "pointer-events-auto" : "pointer-events-none"
-                }`}
-              >
-                {intro.final.ctaLabel}
-              </a>
-            </motion.div>
           </motion.div>
 
           {/* Four acts, four quiet markers. Every act now sits on dark —

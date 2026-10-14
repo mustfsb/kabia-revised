@@ -32,6 +32,8 @@ export async function generateMetadata({
     description:
       result.producer.story ??
       `${result.producer.name} — Kabia'nın güvendiği üreticilerden.`,
+    alternates: { canonical: `/magaza/${result.producer.slug}` },
+    robots: { index: true, follow: true },
   };
 }
 

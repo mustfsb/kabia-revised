@@ -16,7 +16,19 @@ import { ShopHeroBanner } from "@/components/shop/shop-hero-banner";
 export const metadata: Metadata = {
   title: "Mağaza",
   description:
-    "Geyve'deki bahçelerimizden çiğ badem, kavrulmuş badem, badem unu ve badem ezmesi. Katkısız, tek kaynaktan.",
+    "Kabuklu badem, kabuklu fındık, kabuklu ceviz, bal, ıhlamur, salça, sirke, erişte, tarhana. Katkısız, izlenebilir, hikâyesiyle.",
+  keywords: [
+    "kabuklu badem",
+    "organik badem",
+    "kabuklu fındık",
+    "kabuklu ceviz",
+    "doğal bal",
+    "ıhlamur",
+    "domates salçası",
+    "elma sirkesi",
+    "erişte",
+    "tarhana",
+  ],
   alternates: { canonical: "/magaza" },
 };
 
@@ -113,11 +125,11 @@ export default async function ShopPage({
             id="shop-heading"
             className="mt-6 max-w-3xl text-4xl leading-[1.08] tracking-tight md:text-6xl"
           >
-            Bahçeden <em className="font-theme-display italic text-brand">sofraya</em>.
+            <em className="font-theme-display italic text-brand">Mağaza</em>.
           </h1>
           <p className="mt-7 max-w-md text-base leading-relaxed text-ink/65">
-            Geyve&apos;deki bahçelerimizde kimyasal gübre ve ilaç kullanmadan
-            yetiştirilen badem. Katkı maddesi eklenmez.
+            Önce hikâyesini okumanızı isteriz — nereden geldiğini, neden
+            Kabia&apos;da olduğunu. Sonra hasattan dilediğinizi seçebilirsiniz.
           </p>
         </div>
 

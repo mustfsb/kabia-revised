@@ -16,10 +16,7 @@ import { ThemeToggle } from "@/components/ui/theme-toggle";
 /* The farm anchor is deliberately absent: /ciftlik now carries the farm story
    in full, and the homepage section is only its short introduction, so keeping
    both would put two links labelled "Çiftlik" in the same nav. */
-const sectionItems = [
-  { label: "Yaklaşım", href: routes.farmApproach },
-  { label: "İletişim", href: routes.contact },
-];
+const sectionItems = [{ label: "İletişim", href: routes.contact }];
 
 /* Mobile index groupings. Primary is where Kabia lives (shop, farm, the
    people behind the selection); account keeps commerce and contact at hand.
@@ -27,6 +24,7 @@ const sectionItems = [
 const mobilePrimary = [
   { label: "Çiftlik", href: routes.farm },
   { label: "Seçki", href: routes.secki },
+  { label: "Mutfak", href: routes.mutfak },
   { label: "Üreticiler", href: routes.producers },
   { label: "Mağaza", href: routes.store },
 ];
@@ -198,6 +196,16 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
           >
             Seçki
           </Link>
+          <Link
+            href={routes.mutfak}
+            prefetch={false}
+            aria-current={pathname.startsWith(routes.mutfak) ? "page" : undefined}
+            className={`text-sm transition-colors duration-300 hover:text-ink ${
+              pathname.startsWith(routes.mutfak) ? "text-ink" : "text-ink/70"
+            }`}
+          >
+            Mutfak
+          </Link>
 
           {sectionItems.map((item) => (
             <a
@@ -213,9 +221,7 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
             href={routes.store}
             prefetch={false}
             aria-current={pathname.startsWith(routes.store) ? "page" : undefined}
-            className={`text-sm transition-colors duration-300 hover:text-ink ${
-              pathname.startsWith(routes.store) ? "text-ink" : "text-ink/70"
-            }`}
+            className="inline-flex min-h-11 items-center rounded-full bg-brand px-5 text-sm font-medium text-on-brand transition-colors duration-300 hover:bg-forest"
           >
             Mağaza
           </Link>
@@ -311,7 +317,7 @@ export function SiteHeader({ bannerOffset = false }: { bannerOffset?: boolean })
                 not a fixed bar with a second panel unfolding beneath it.
                 w-full matters — as a flex item .wrap would shrink-wrap and
                 pull the logo and icons toward the center. */}
-            <div className="wrap flex h-16 w-full shrink-0 items-center justify-between border-b border-ink/10">
+            <div className="wrap flex h-[calc(4rem+env(safe-area-inset-top))] w-full shrink-0 items-center justify-between border-b border-ink/10 pt-[env(safe-area-inset-top)]">
               <Link
                 href={routes.home}
                 prefetch={false}

@@ -86,10 +86,13 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const toggle = useCallback(
-    () => setChoice(resolved === "dark" ? "light" : "dark"),
-    [resolved, setChoice],
-  );
+  // Üç konumlu döngü: aydınlık → karanlık → sistem → (sistemde o ankinin tersi).
+  // Sisteme dönüş yolu olmadan ziyaretçi seçimi geri alamazdı.
+  const toggle = useCallback(() => {
+    if (choice === "light") setChoice("dark");
+    else if (choice === "dark") setChoice("system");
+    else setChoice(resolved === "dark" ? "light" : "dark");
+  }, [choice, resolved, setChoice]);
 
   const value = useMemo(
     () => ({ choice, resolved, setChoice, toggle }),

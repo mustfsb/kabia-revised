@@ -55,10 +55,10 @@ export default function Page() {
       <ul>
         <li>
           Ürünün cinsi, miktarı, birim fiyatı, varyantı (gramaj) ve KDV dahil toplam bedeli sipariş özetinde gösterilir.
-          Kabia ekolojik badem ve ilgili gıda ürünleri, kimyasal gübre/ilaç kullanılmadan üretilir; ürün etiketinde
+          Kabia ekolojik ürünleri (kabuklu badem, fındık, ceviz, bal, ıhlamur ve mutfak ürünleri) kimyasal gübre/ilaç kullanılmadan üretilir; ürün etiketinde
           alerjen uyarısı yer alabilir.
         </li>
-        <li>Kargo ücreti sepet tutarına göre değişir; 500 ₺ ve üzeri siparişlerde kargo ücretsizdir (kampanya dönemi hariç).</li>
+        <li>Kargo ücreti sepet tutarına göre değişir; 2000 ₺ ve üzeri siparişlerde kargo ücretsizdir (kampanya dönemi hariç).</li>
         <li>Ödeme, kredi/banka kartı veya kapıda ödeme seçeneklerinden biri ile yapılır. Kartlı ödemelerde tahsilat, sipariş onayıyla birlikte provizyon alınarak gerçekleşir.</li>
         <li>Fiyatlarda Satıcı’nın açık hatası (ör. 1 ₺ yerine 1000 ₺) tespit edilirse Satıcı siparişi iptal edip bedeli iade edebilir.</li>
       </ul>
@@ -80,7 +80,7 @@ export default function Page() {
       <ul>
         <li>
           <strong>İstisna:</strong> Gıda ürünlerinde, ambalajı açılmış, bozulabilecek, hijyen nedeniyle iade edilemeyecek
-          ürünlerde cayma hakkı kullanılamaz. Kabia bademleri bu kapsamda <em>ambalajı açılmamış ve bozulmamış</em> ise cayma
+          ürünlerde cayma hakkı kullanılamaz. Kabia ürünleri bu kapsamda <em>ambalajı açılmamış ve bozulmamış</em> ise cayma
           hakkına tabidir; tadil edilmiş/kullanılmış gıda iade alınmaz.
         </li>
         <li>Cayma halinde ürün bedeli, ürün Satıcı’ya ulaştıktan sonra en geç 14 gün içinde Alıcı’ya iade edilir.</li>

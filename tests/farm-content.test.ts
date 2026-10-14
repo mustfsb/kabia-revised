@@ -9,18 +9,6 @@ const farmContent = await import("../content/farm.ts").catch(() => ({
 
 const expectedTimeline = [
   {
-    id: "2019",
-    year: "2019",
-    eyebrow: "2019 KASIM — OLMAZ DENİLENİ YAPMAK",
-    heading: "Burada badem olmaz dediler. Biz toprağa kulak verdik.",
-    paragraphs: [
-      "2019 Kasım, Sabırlar. Hasat sonrası anızda tek bir meşe, uzakta kavaklar. Boş sanılan bu yamaç için “burada badem tutmaz” deniyordu. Bizim niyetimiz yapılmayanı denemekti — verim cetveline değil, toprağın kendi hafızasına güvenmek. O gün anızın üzerine düşen gölgemizle ilk kez sürmeye değil, dinlemeye geldik.",
-      "O kışı analize, rüzgara ve don çukurlarını öğrenmeye ayırdık. Bir yıl boyunca tek bir fidan dikmeden yalnızca gözlemledik. Çünkü Kabia’da hikaye fidanla değil, toprakla başlar. Bu sessiz tarla iki yıl sonra 946 Marinada ile tanışacaktı — cesaret o gün, bu anızda filizlendi.",
-    ],
-    image: "/images/resim22.jpg",
-    imageAlt: "2019 Kasım — Bahçe kurulmadan önce, Sabırlar",
-  },
-  {
     id: "2021",
     year: "2021",
     eyebrow: "2021 TEMMUZ — 946 FİDAN TOPRAKLA BULUŞTU",
@@ -94,6 +82,19 @@ const expectedTimeline = [
     image: "/images/marinada-2025-don.jpeg",
     imageAlt: "2025 18 Mart — 4 gün süren don, çiçekte yakalandı",
   },
+  {
+    id: "2026",
+    year: "2026",
+    substep: "Yeni sezon",
+    eyebrow: "2026 — YENİ SEZON",
+    heading: "Notlar hazır, bahçe uyanıyor.",
+    paragraphs: [
+      "Yeni sezon. Notlarımız hazır: kompost sıraları, çay takvimi, çiçeklenme gözlemleri. Bu yılın hasadı, bu notlarla başlıyor.",
+      "Kompost sıraları serili, çay takvimi duvarda, gözlem defteri açık. Yeni sezonun ilk işi toprağa dokunmak değil, not almak — bahçe ne derse onu yapacağız.",
+    ],
+    image: "/images/orchard-hillside.jpg",
+    imageAlt: "2026 — Yeni sezon, Kılıçkaya yamaçları",
+  },
 ] as const
 
 describe("farm source content", () => {
@@ -105,12 +106,11 @@ describe("farm source content", () => {
     })
   })
 
-  it("keeps all seven emanet principles verbatim and in order", () => {
+  it("keeps all six emanet principles verbatim and in order", () => {
     assert.deepEqual(farmContent.farmPrinciples, [
       "Önce toprak, sonra ağaç.",
       "Toprağı sürmüyoruz.",
       "Otları biçmiyoruz.",
-      "Dışarıdan girdi yok — organik sertifikalı bile olsa gübre almıyoruz.",
       "Tüm girdiler doğadan ve kendi bahçemizden: kompost, kompost gübresi, kompost çayı.",
       "Doğayı kontrol etmiyoruz, taklit ediyoruz.",
       "Her paket hasat tarihli — ne zaman, nereden, kimden.",
@@ -134,18 +134,18 @@ describe("farm source content", () => {
     assert.deepEqual(
       farmContent.farmTimeline.map((state) => [state.year, state.substep ?? null]),
       [
-        ["2019", null],
         ["2021", null],
         ["2022", null],
         ["2023", null],
         ["2024", null],
         ["2025", "Erken bahar"],
         ["2025", "Don"],
+        ["2026", "Yeni sezon"],
       ],
     )
   })
 
-  it("does not mix in emanet year notes or a 2026 placeholder", () => {
+  it("does not mix in the old emanet year notes", () => {
     assert.ok(Array.isArray(farmContent.farmTimeline))
     const serialized = JSON.stringify(farmContent.farmTimeline)
     for (const excluded of [
@@ -153,8 +153,6 @@ describe("farm source content", () => {
       "Sürümü bıraktık.",
       "Kompost çayı uygulamaları başladı.",
       "JADAM killi koruma",
-      "Yeni sezon. Notlarımız hazır",
-      "2026",
     ]) {
       assert.equal(serialized.includes(excluded), false, excluded)
     }

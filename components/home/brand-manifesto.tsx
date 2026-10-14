@@ -30,8 +30,9 @@ export function BrandManifesto() {
             <p className="max-w-xs text-sm leading-relaxed text-ink/60">
               {manifesto.body}
             </p>
-            <div className="mt-6">
+            <div className="mt-6 flex flex-wrap gap-x-6 gap-y-3">
               <ArrowLink href={routes.secki}>Seçkiyi gör</ArrowLink>
+              <ArrowLink href={routes.mutfak}>Mutfağı gör</ArrowLink>
             </div>
           </Reveal>
         </div>
