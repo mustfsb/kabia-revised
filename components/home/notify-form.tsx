@@ -63,7 +63,7 @@ export function NotifyForm() {
           maxLength={254}
           placeholder="ornek@eposta.com"
           aria-invalid={errors.email ? true : undefined}
-          className="min-h-11 w-full rounded-theme-input border border-ink/20 bg-ivory px-5 text-sm text-ink placeholder:text-ink/40 focus:border-brand focus:outline-none"
+          className="min-h-11 w-full rounded-theme-input border border-ink/20 bg-ivory px-5 text-base text-ink placeholder:text-ink/40 focus:border-brand focus:outline-none"
         />
         <SubmitButton />
       </div>

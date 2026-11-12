@@ -181,6 +181,17 @@ function StageBackdrop({ active }: { active: boolean }) {
     return () => window.removeEventListener("load", syncFromReadyState);
   }, []);
 
+  // A device asking to save data never downloads the footage: the poster is
+  // already the video's first frame, so the still is visually identical.
+  // Read once in the initializer (never in an effect) so the first paint
+  // already knows; the server has no navigator, so it defaults to false.
+  const [saveData] = useState(
+    () =>
+      typeof navigator !== "undefined" &&
+      (navigator as Navigator & { connection?: { saveData?: boolean } })
+        .connection?.saveData === true,
+  );
+
   // Idle-start: the footage waits for a quiet main thread after load (with a
   // timeout backstop), so its multi-megabyte range request never shares the
   // pipe with fonts and the H1. The poster holds the frame until then.
@@ -210,6 +221,16 @@ function StageBackdrop({ active }: { active: boolean }) {
       el.pause();
     }
   }, [active, pageLoaded, idle]);
+
+  if (saveData) {
+    return (
+      <div aria-hidden="true" className="absolute inset-0 z-0 overflow-hidden">
+        <img src={HERO_POSTER} alt="" className="h-full w-full object-cover" />
+        <div className="absolute inset-0 bg-forest/20" />
+        <div className="absolute inset-0 bg-gradient-to-b from-forest/55 via-transparent to-forest/65" />
+      </div>
+    );
+  }
 
   return (
     <div aria-hidden="true" className="absolute inset-0 z-0 overflow-hidden">
@@ -530,7 +551,7 @@ function ScrollIntro() {
            lands its atmosphere, then hands the visitor to the products
            instead of dwelling on the same feeling twice. */}
       <div ref={wrapperRef} className="relative h-[280vh] md:h-[300vh]">
-        <div ref={stageRef} className="sticky top-0 h-screen overflow-hidden">
+        <div ref={stageRef} className="sticky top-0 h-dvh overflow-hidden">
           <StageBackdrop active={inView} />
 
           {/* The ground the film closes onto — a plain panel, so once the

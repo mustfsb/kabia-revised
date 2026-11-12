@@ -220,25 +220,16 @@ export function isAccountSurface(pathname: string | null | undefined): boolean {
 /**
  * The floating contact button's allowlist — the single rule for where it
  * may appear. Default-deny: anything not listed here never renders it, so
- * product pages (/shop/*, which carry the mobile buy bar), the cart
- * (/sepet), checkout (/odeme), account and auth surfaces, legal pages,
- * guides (/rehber/*) and all of /admin stay free of it without their own
- * per-page or per-breakpoint conditions.
- *
- * The homepage is listed but intro-gated: WhatsAppFloat keeps it hidden
- * until its IntersectionObserver reports the whole intro has left the viewport.
+ * the homepage, farm, journal, secki and mutfak pages, the cart (/sepet),
+ * checkout (/odeme), account and auth surfaces, legal pages, guides
+ * (/rehber/*) and all of /admin stay free of it without their own per-page
+ * or per-breakpoint conditions. Only the store and product pages show it:
+ * that is where a buying question is asked.
  */
-const CONTACT_FLOAT_PREFIXES = [
-  routes.store,
-  routes.farm,
-  routes.journal,
-  routes.secki,
-  routes.mutfak,
-] as const
+const CONTACT_FLOAT_PREFIXES = [routes.store, "/shop"] as const
 
 export function isContactFloatRoute(pathname: string | null | undefined): boolean {
   if (!pathname) return false
-  if (pathname === routes.home) return true
   return (CONTACT_FLOAT_PREFIXES as readonly string[]).some(
     (base) => pathname === base || pathname.startsWith(`${base}/`),
   )

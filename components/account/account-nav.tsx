@@ -11,6 +11,7 @@ const SECTIONS = [
   { href: routes.accountOrders, label: "Siparişlerim" },
   { href: `${routes.account}/adreslerim`, label: "Adreslerim" },
   { href: `${routes.account}/favorilerim`, label: "Favorilerim" },
+  { href: `${routes.account}/kart-bilgilerim`, label: "Kartlarım" },
   { href: routes.accountProfile, label: "Bilgilerim" },
   { href: `${routes.account}/bildirimler`, label: "Bildirimler" },
   { href: routes.accountSecurity, label: "Güvenlik" },

@@ -8,8 +8,9 @@ import { NotifyForm } from "@/components/home/notify-form";
 export function HarvestNotify() {
   return (
     <section
+      id="haber-ver"
       aria-labelledby="notify-heading"
-      className="border-t border-ink/10 bg-paper"
+      className="scroll-mt-20 border-t border-ink/10 bg-paper"
     >
       <div className="wrap py-20 md:py-24">
         <div className="mx-auto max-w-xl text-center">

@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
 import { test } from 'node:test';
 const listing = await import('../lib/store-listing.ts').catch(() => null);
 // Category is the database slug plus the administered name, so a category an
@@ -115,4 +116,13 @@ test('listingHref keeps the existing parameters and omits defaults', () => {
   assert.equal(listing.listingHref('/magaza','tumu','tumu','onerilen'),'/magaza');
   assert.equal(listing.listingHref('/magaza','cig-badem','ciftlik','fiyat-artan'),'/magaza?kategori=cig-badem&kaynak=ciftlik&sirala=fiyat-artan');
   assert.equal(listing.listingHref('/magaza/tarhana','tumu','tumu','fiyat-azalan'),'/magaza/tarhana?sirala=fiyat-azalan');
+});
+
+test('an empty catalogue points at the harvest notify list, not a dead end', () => {
+  const src = readFileSync('components/shop/store-listing.tsx', 'utf8');
+  assert.match(src, /homeAnchor\("#haber-ver"\)/);
+  assert.match(src, /Hasat açılınca haber ver/);
+  const notify = readFileSync('components/home/harvest-notify.tsx', 'utf8');
+  assert.match(notify, /id="haber-ver"/);
+  assert.match(notify, /scroll-mt-20/);
 });

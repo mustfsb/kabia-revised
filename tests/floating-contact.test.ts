@@ -6,25 +6,25 @@ import { isContactFloatRoute } from "../lib/site.ts"
 const read = (path: string) => readFileSync(path, "utf8")
 
 describe("floating contact button allowlist", () => {
-  it("shows on the store, farm, journal, secki, mutfak and home", () => {
+  it("shows only on the store and product pages", () => {
     for (const path of [
-      "/",
       "/magaza",
       "/magaza/kabia-ciftligi",
-      "/ciftlik",
-      "/gunluk",
-      "/gunluk/hasat-gunlugu",
-      "/secki",
-      "/mutfak",
+      "/shop/bal",
+      "/shop",
     ]) {
       assert.equal(isContactFloatRoute(path), true, path)
     }
   })
 
-  it("hides on product, cart, checkout, account, auth, legal, guides and admin routes", () => {
+  it("hides on home, brand pages, cart, checkout, account, auth, legal, guides and admin routes", () => {
     for (const path of [
-      "/shop/bal",
-      "/shop",
+      "/",
+      "/ciftlik",
+      "/gunluk",
+      "/gunluk/hasat-gunlugu",
+      "/secki",
+      "/mutfak",
       "/sepet",
       "/odeme",
       "/hesabim",
@@ -53,6 +53,7 @@ describe("floating contact button allowlist", () => {
       "/ureticiler",
       "/badem",
       "/magazax",
+      "/shopx",
       "/gunlukx",
       null,
       undefined,
@@ -70,21 +71,18 @@ describe("floating contact button component rules", () => {
     assert.match(src(), /isContactFloatRoute/)
     assert.ok(!src().includes("isAccountSurface"), "no account-surface condition")
     assert.ok(!src().includes("hidden xl:"), "no breakpoint hiding")
-    // One allowlist, one place: the component holds no route literals.
+    // One allowlist, one place: the component holds no route literals
+    // except the buy-bar prefix it lifts above.
     for (const literal of ["/magaza", "/ciftlik", "/gunluk", "/secki", "/mutfak", "/sepet", "/odeme", "/admin"]) {
       assert.ok(!src().includes(`"${literal}"`), literal)
     }
   })
 
-  it("gates the homepage on an IntersectionObserver over the whole intro, not a scroll listener", () => {
-    assert.match(src(), /IntersectionObserver/)
-    assert.match(src(), /CONTACT_FLOAT_HERO_SELECTOR/)
-    assert.ok(!/addEventListener\("scroll"|window\.scrollY|scrollTo/.test(src()), "no scroll listener")
-    const intro = read("components/home/intro-sequence.tsx")
-    // Both variants (scroll story and reduced-motion stills) gate on the
-    // whole section — past the closing green panel — not the first screen.
-    const sections = intro.match(/<section[^>]*data-site-hero/g) || []
-    assert.equal(sections.length, 2, "both intro variants carry the marker on their section")
+  it("rides above the mobile sticky buy bar on product pages", () => {
+    assert.match(src(), /aboveBuyBar/)
+    assert.match(src(), /startsWith\("\/shop\/"\)/)
+    assert.match(src(), /bottom-\[calc\(6rem\+var\(--safe-bottom\)\)\]/)
+    assert.match(src(), /bottom-\[calc\(1\.25rem\+var\(--safe-bottom\)\)\]/)
   })
 
   it("starts hidden on server and client and unmounts when hidden", () => {

@@ -38,3 +38,25 @@ describe("homepage intro settings", () => {
     assert.match(page, /<IntroProductsForm/);
   });
 });
+
+describe("homepage hero footage restraint", () => {
+  it("data-saving devices get the still, never the download", () => {
+    const src = readFileSync("components/home/intro-sequence.tsx", "utf8");
+    assert.match(src, /connection\?\.saveData === true/);
+    assert.match(src, /if \(saveData\) \{/);
+  });
+
+  it("full-height stages track the dynamic viewport", () => {
+    const intro = readFileSync("components/home/intro-sequence.tsx", "utf8");
+    assert.match(intro, /sticky top-0 h-dvh overflow-hidden/);
+    assert.ok(!intro.includes("h-screen"), "no static viewport stage left");
+    const editorial = readFileSync("components/home/editorial-image.tsx", "utf8");
+    assert.match(editorial, /h-\[64dvh\]/);
+    assert.match(editorial, /md:h-\[82dvh\]/);
+  });
+
+  it("notify e-mail field stays at iOS no-zoom size", () => {
+    const src = readFileSync("components/home/notify-form.tsx", "utf8");
+    assert.match(src, /px-5 text-base text-ink placeholder:text-ink\/40/);
+  });
+});

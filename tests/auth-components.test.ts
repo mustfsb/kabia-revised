@@ -258,7 +258,7 @@ describe("account area wiring", () => {
 
   it("saved-card entry is gone and nothing writes payment_methods", () => {
     const nav = read("components/account/account-nav.tsx")
-    assert.ok(!nav.includes("kart-bilgilerim"))
+    assert.ok(nav.includes("kart-bilgilerim"), "retired page stays linked from the account menu")
     assert.ok(!/from\("payment_methods"\)/.test(read("lib/cards-context.tsx")))
     assert.ok(!/<input|<form|cardNumber/.test(read("app/hesabim/kart-bilgilerim/page.tsx")), "no card entry on the old URL")
   })

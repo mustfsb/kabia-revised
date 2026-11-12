@@ -279,6 +279,30 @@ export function ProductTabs({
   nutrition: ReactNode;
 }) {
   const { product, activeTab, setActiveTab, reviewsRef } = useProductDetailState();
+  const tabs = preview ? TABS.slice(0, 1) : TABS;
+  const tabRefs = useRef<(HTMLButtonElement | null)[]>([]);
+  // WAI-APG tabs: arrow keys move between tabs and activate as they go;
+  // Home/End jump to the ends. Only the active tab is in the tab order.
+  const focusTab = (index: number) => {
+    const next = (index + tabs.length) % tabs.length;
+    setActiveTab(tabs[next].id);
+    tabRefs.current[next]?.focus();
+  };
+  const onTabKeyDown = (event: React.KeyboardEvent, index: number) => {
+    if (event.key === "ArrowRight") {
+      event.preventDefault();
+      focusTab(index + 1);
+    } else if (event.key === "ArrowLeft") {
+      event.preventDefault();
+      focusTab(index - 1);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      focusTab(0);
+    } else if (event.key === "End") {
+      event.preventDefault();
+      focusTab(tabs.length - 1);
+    }
+  };
   // The reviews panel is its own chunk: fetch it once the tabs come within a
   // screen of the viewport, so it is usually ready before anyone opens it.
   useEffect(() => {
@@ -299,18 +323,23 @@ export function ProductTabs({
   return (
       <div className="mt-20 md:mt-28" ref={reviewsRef}>
         <div className="border-b border-ink/10">
-          <div role="tablist" aria-label="Ürün bilgileri" className="flex flex-wrap gap-8">
-            {(preview ? TABS.slice(0, 1) : TABS).map((tab) => {
+          <div role="tablist" aria-label="Ürün bilgileri" className="flex flex-wrap gap-x-8 gap-y-2">
+            {tabs.map((tab, index) => {
               const active = tab.id === activeTab;
               return (
                 <button
                   key={tab.id}
                   type="button"
                   role="tab"
+                  ref={(el) => {
+                    tabRefs.current[index] = el;
+                  }}
+                  tabIndex={active ? 0 : -1}
                   id={`tab-${tab.id}`}
                   aria-selected={active}
                   aria-controls={`panel-${tab.id}`}
                   onClick={() => setActiveTab(tab.id)}
+                  onKeyDown={(event) => onTabKeyDown(event, index)}
                   onPointerEnter={tab.id === "degerlendirmeler" ? () => void loadReviewsPanel() : undefined}
                   onFocus={tab.id === "degerlendirmeler" ? () => void loadReviewsPanel() : undefined}
                   className={`-mb-px min-h-12 border-b-2 text-sm transition-colors duration-300 ${

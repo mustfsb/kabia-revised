@@ -182,8 +182,9 @@ describe("Producer shelves", () => {
 })
 
 describe("Heading outline", () => {
-  it("footer column labels are not document headings", () => {
+  it("footer columns are labelled headings", () => {
     const footer = readFileSync("components/layout/site-footer.tsx", "utf8")
-    assert.ok(!/<h2 className="label text-olive">/.test(footer))
+    const headings = footer.match(/<h2 className="label text-olive">/g) || []
+    assert.equal(headings.length, 3, "Mağaza, Çiftlik, Destek")
   })
 })
