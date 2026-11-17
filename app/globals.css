@@ -169,6 +169,21 @@
   background-color: #1e7a4e;
 }
 
+/* Mağaza slider'ının butonu: açık modda hover ivory'ye döner, ama koyu modda
+   ivory koyu zemine döner ve buton kaybolur. Koyu modda hover dolgu yeşili
+   (#1e7a4e, beyaz yazıyla 4.5:1'i geçer) ve beyaz yazı. Katmansız: Tailwind'in
+   hover:bg-ivory'sini ezer. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .slider-cta:hover {
+    background-color: #1e7a4e;
+    color: #fff;
+  }
+}
+:root[data-theme="dark"] .slider-cta:hover {
+  background-color: #1e7a4e;
+  color: #fff;
+}
+
 /* Koyu zeminde fotoğraflar kısılır: aydınlık kağıt için çekilmiş kareler
    siyah üstünde parlar. Yalnızca object-cover kadrajlar etkilenir; belge,
    logo ve kapak görselleri tam parlak kalır. */

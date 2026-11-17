@@ -77,3 +77,23 @@ describe("featured products", () => {
     assert.match(entry, /% ?\{?.*indirim|indirim/)
   })
 })
+
+describe("slider overlay in dark mode", () => {
+  const css = readFileSync("app/globals.css", "utf8")
+
+  it("the scrim and the counter use fixed dark tones, not the ink token that turns light in dark mode", () => {
+    assert.doesNotMatch(slider, /from-ink\/|via-ink\/|bg-ink\//)
+    assert.match(slider, /from-black\//)
+  })
+
+  it("the slide button hovers to green with white text in dark mode, never to the dark surface", () => {
+    assert.match(slider, /slider-cta/)
+    for (const scope of [/:root:not\(\[data-theme="light"\]\) \.slider-cta:hover/, /:root\[data-theme="dark"\] \.slider-cta:hover/]) {
+      const at = css.search(scope)
+      assert.ok(at >= 0, String(scope))
+      const rule = css.slice(at, css.indexOf("}", at))
+      assert.match(rule, /background-color: #1e7a4e/)
+      assert.match(rule, /color: #fff/)
+    }
+  })
+})

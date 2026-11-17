@@ -69,7 +69,7 @@ function MediaSlide({ slide, active, playing, first }: { slide: SliderSlide; act
         />
       )}
       {overlay && (
-        <div className="on-dark absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-ink/80 via-ink/20 to-transparent p-6 pb-14 md:p-12 md:pb-14">
+        <div className="on-dark absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-black/75 via-black/25 to-transparent p-6 pb-14 md:p-12 md:pb-14">
           {slide.headline && (
             <h2 className="max-w-2xl text-3xl leading-[1.1] tracking-tight text-cream md:text-5xl">{slide.headline}</h2>
           )}
@@ -78,7 +78,7 @@ function MediaSlide({ slide, active, playing, first }: { slide: SliderSlide; act
               href={slide.linkHref}
               prefetch={false}
               tabIndex={active ? undefined : -1}
-              className="mt-6 inline-block w-fit rounded-theme-button bg-cream px-7 py-3.5 text-sm font-medium text-forest transition-colors duration-300 hover:bg-ivory"
+              className="slider-cta mt-6 inline-block w-fit rounded-theme-button bg-cream px-7 py-3.5 text-sm font-medium text-forest transition-colors duration-300 hover:bg-ivory"
             >
               {slide.linkLabel}
             </Link>
@@ -192,13 +192,13 @@ export function ShopSlider({ view }: { view: ShopSliderView }) {
             <button type="button" aria-label="Sonraki slayt" onClick={() => goTo(active + 1)} className={cn(arrowClass, "right-3 min-[1320px]:-right-16")}>
               <ChevronRight className="h-5 w-5" aria-hidden="true" />
             </button>
-            <div className="absolute bottom-3 right-3 z-10 flex items-center gap-1 rounded-full bg-ink/55 py-1 pl-1 pr-3 text-cream backdrop-blur-sm">
+            <div className="absolute bottom-3 right-3 z-10 flex items-center gap-1 rounded-full bg-black/55 py-1 pl-1 pr-3 text-white backdrop-blur-sm">
               <button
                 type="button"
                 aria-label={playing ? "Slider'ı durdur" : "Slider'ı başlat"}
                 aria-pressed={!playing}
                 onClick={() => setUserPaused(playing)}
-                className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-cream/15"
+                className="flex h-8 w-8 items-center justify-center rounded-full transition-colors hover:bg-white/15"
               >
                 {playing ? <Pause className="h-3.5 w-3.5" aria-hidden="true" /> : <Play className="h-3.5 w-3.5" aria-hidden="true" />}
               </button>
