@@ -97,7 +97,7 @@ export interface MediaAsset {
 }
 
 /** Where an image can be referenced from. Every kind blocks deletion of the asset. */
-export type MediaUsageKind = "product" | "producer" | "journal"
+export type MediaUsageKind = "product" | "producer" | "journal" | "slider"
 
 export interface MediaUsage {
   kind: MediaUsageKind

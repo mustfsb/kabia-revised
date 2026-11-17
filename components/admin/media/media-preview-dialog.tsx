@@ -37,12 +37,14 @@ const USAGE_KIND_LABELS: Record<MediaUsage["kind"], string> = {
   product: "Ürün",
   producer: "Üretici",
   journal: "Günlük",
+  slider: "Slider",
 }
 
 const USAGE_PRIMARY_LABELS: Record<MediaUsage["kind"], string> = {
   product: "ana görsel",
   producer: "fotoğraf",
   journal: "kapak",
+  slider: "slayt",
 }
 
 export function MediaPreviewDialog({

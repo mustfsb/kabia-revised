@@ -209,3 +209,34 @@ describe("loadMediaUsage", () => {
     await assert.rejects(() => loadMediaUsage(client as never, [A]), /kullanım bilgisi/i)
   })
 })
+
+describe("video and slider usage", () => {
+  const V = { ...asset("v1", "slider/2026-11/hasat-dddd4444.mp4"), bucketId: "content-video", mimeType: "video/mp4" }
+
+  it("a journal entry's video holds its asset", async () => {
+    const { collateUsage } = await import("../lib/admin/media-usage.ts")
+    const usage = collateUsage([V], { ...empty, journalVideo: [{ id: "j1", slug: "kaolin", video_asset_id: "v1" }] })
+    assert.deepEqual(usage.get("v1"), [
+      { kind: "journal", id: "j1", name: "kaolin", href: "/admin/journal/j1", isPrimary: false },
+    ])
+  })
+
+  it("a slide holds its media and its poster", async () => {
+    const { collateUsage } = await import("../lib/admin/media-usage.ts")
+    const usage = collateUsage([V, A, UNUSED], {
+      ...empty,
+      sliderSlides: [{ id: "s1", media_asset_id: "v1", poster_asset_id: "a1" }],
+    })
+    assert.equal(usage.get("v1")?.[0].kind, "slider")
+    assert.equal(usage.get("v1")?.[0].href, "/admin/content")
+    assert.equal(usage.get("a1")?.[0].kind, "slider")
+    assert.deepEqual(usage.get("u1"), [])
+  })
+
+  it("names the slider in the summary and in the refusal", async () => {
+    const { summariseUsage, deleteBlockedMessage } = await import("../lib/admin/media-usage.ts")
+    const entry = { kind: "slider" as const, id: "s1", name: "Mağaza slider'ı", href: "/admin/content", isPrimary: false }
+    assert.equal(summariseUsage([entry]), "1 slider'da kullanılıyor")
+    assert.match(deleteBlockedMessage([entry]), /Mağaza slider'ı \(mağaza slider'ı\)/)
+  })
+})

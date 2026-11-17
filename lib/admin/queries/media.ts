@@ -185,7 +185,10 @@ export class MediaUsageUnavailableError extends Error {
  * catalogue and anything created before it carry only a URL. Missing either
  * would let a referenced image be deleted.
  *
- * Fails closed. If any of the five reads errors, this throws
+ * Library videos (journal) and the shop slider reference assets by id, so
+ * those two reads match on id.
+ *
+ * Fails closed. If any of the seven reads errors, this throws
  * MediaUsageUnavailableError rather than reporting "unused" — a transient
  * failure must never be what allows a live storefront image to be deleted.
  */
@@ -200,12 +203,18 @@ export async function loadMediaUsage(
   const quote = (values: string[]) => values.map((v) => `"${v}"`).join(",")
   const byUrlOrPath = `image_url.in.(${quote(urls)}),storage_path.in.(${quote(paths)})`
 
-  const [productGallery, productMain, producers, journalCover, journalGallery] = await Promise.all([
+  const ids = assets.map((asset) => asset.id)
+  const [productGallery, productMain, producers, journalCover, journalGallery, journalVideo, sliderSlides] = await Promise.all([
     supabase.from("product_images").select("image_url, storage_path, products(id, name)").or(byUrlOrPath),
     supabase.from("products").select("id, name, main_image_url").in("main_image_url", urls),
     supabase.from("producers").select("id, name, photo_url").in("photo_url", urls),
     supabase.from("journal_entries").select("id, slug, cover_image_url").in("cover_image_url", urls),
     supabase.from("journal_entry_images").select("image_url, storage_path, journal_entries(id, slug)").or(byUrlOrPath),
+    supabase.from("journal_entries").select("id, slug, video_asset_id").in("video_asset_id", ids),
+    supabase
+      .from("shop_slides")
+      .select("id, media_asset_id, poster_asset_id")
+      .or(`media_asset_id.in.(${ids.join(",")}),poster_asset_id.in.(${ids.join(",")})`),
   ])
 
   const failed = [
@@ -214,6 +223,8 @@ export async function loadMediaUsage(
     ["media:usage:producers", producers],
     ["media:usage:journalCover", journalCover],
     ["media:usage:journalGallery", journalGallery],
+    ["media:usage:journalVideo", journalVideo],
+    ["media:usage:slider", sliderSlides],
   ] as const
   let unavailable = false
   for (const [context, result] of failed) {
@@ -230,6 +241,8 @@ export async function loadMediaUsage(
     producers: (producers.data ?? []) as UsageRows["producers"],
     journalCover: (journalCover.data ?? []) as UsageRows["journalCover"],
     journalGallery: (journalGallery.data ?? []) as unknown as UsageRows["journalGallery"],
+    journalVideo: (journalVideo.data ?? []) as NonNullable<UsageRows["journalVideo"]>,
+    sliderSlides: (sliderSlides.data ?? []) as NonNullable<UsageRows["sliderSlides"]>,
   })
 }
 
