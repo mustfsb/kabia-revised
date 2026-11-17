@@ -167,3 +167,13 @@ export function inStock(product: Pick<Product, "variants">): boolean {
 export function formatTL(amount: number): string {
   return `₺${amount.toFixed(2).replace(".", ",")}`
 }
+
+/**
+ * The discount as a whole percent ("%13 indirim"), or null when there is no
+ * real discount. Under half a percent rounds to 0 and is not claimed.
+ */
+export function discountPercent(price: number, original?: number | null): number | null {
+  if (original == null || !(original > price) || !(price >= 0)) return null
+  const percent = Math.round(((original - price) / original) * 100)
+  return percent > 0 ? percent : null
+}
