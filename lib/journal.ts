@@ -1,4 +1,5 @@
 import { honestCache } from "@/lib/honest-cache"
+import { publicMediaUrl } from "@/lib/admin/media"
 import type { SupabaseClient } from "@supabase/supabase-js"
 
 /**
@@ -12,7 +13,8 @@ import type { SupabaseClient } from "@supabase/supabase-js"
  *
  * `photo` is the entry's cover image. `gallery` is every image in display order,
  * the cover included, exactly like a product's gallery includes its main image.
- * `video` stays a local path: the media library accepts images only.
+ * `video` is a library video (content-video bucket) or, for older entries, a
+ * local path.
  */
 
 export interface JournalImage {
@@ -51,16 +53,34 @@ export interface JournalEntryRow {
   outcome: string
   cover_image_url: string | null
   video_path: string | null
+  video_bucket?: string | null
+  video_object_path?: string | null
   journal_entry_images?: { image_url: string; alt_text: string | null; sort_order: number }[] | null
 }
 
 const JOURNAL_SELECT =
-  "id, slug, entry_date, location, weather, orchard_state, application, observation, outcome, cover_image_url, video_path, journal_entry_images(image_url, alt_text, sort_order)"
+  "id, slug, entry_date, location, weather, orchard_state, application, observation, outcome, cover_image_url, video_path, video_bucket, video_object_path, journal_entry_images(image_url, alt_text, sort_order)"
 
 /** The journal is a handful of notes a season; this is a ceiling, not a page size. */
 const JOURNAL_LIMIT = 500
 
-export function mapJournalEntry(row: JournalEntryRow): JournalEntry {
+/**
+ * A library video's URL is derived from bucket + path (the row carries the copy
+ * the database trigger keeps), never stored. Without a Supabase URL there is no
+ * honest URL to give, so the video is left out rather than rendered broken.
+ */
+function videoUrl(row: JournalEntryRow, supabaseUrl: string): string | undefined {
+  if (row.video_bucket && row.video_object_path) {
+    return supabaseUrl ? publicMediaUrl(supabaseUrl, row.video_bucket, row.video_object_path) : undefined
+  }
+  return row.video_path ?? undefined
+}
+
+export function mapJournalEntry(
+  row: JournalEntryRow,
+  supabaseUrl: string = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "",
+): JournalEntry {
+  const video = videoUrl(row, supabaseUrl)
   const gallery: JournalImage[] = (row.journal_entry_images ?? [])
     .map((image) => ({ url: image.image_url, altText: image.alt_text, sortOrder: image.sort_order }))
     .sort((a, b) => a.sortOrder - b.sortOrder)
@@ -76,7 +96,7 @@ export function mapJournalEntry(row: JournalEntryRow): JournalEntry {
     observation: row.observation,
     outcome: row.outcome,
     ...(photo ? { photo } : {}),
-    ...(row.video_path ? { video: row.video_path } : {}),
+    ...(video ? { video } : {}),
     gallery,
   }
 }
@@ -103,7 +123,7 @@ export async function fetchPublishedJournal(client: SupabaseClient): Promise<Pub
     .limit(JOURNAL_LIMIT)
 
   if (error || !data) return { status: "error" }
-  return { status: "ok", entries: (data as unknown as JournalEntryRow[]).map(mapJournalEntry) }
+  return { status: "ok", entries: (data as unknown as JournalEntryRow[]).map((row) => mapJournalEntry(row)) }
 }
 
 /** The entries either side of `slug` in date order (input order is irrelevant). */

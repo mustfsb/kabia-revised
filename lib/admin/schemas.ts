@@ -548,8 +548,9 @@ const journalText = (label: string, max: number) =>
  * as a generic database refusal. The cover image is not part of this schema: it
  * is written together with the gallery (journalGallerySchema).
  *
- * The video is a *local* path (the media library accepts images only), so it is
- * held to the same shape the database enforces: a site-relative .mp4/.webm.
+ * The video is a library asset (content-video bucket), chosen in the picker —
+ * never a typed path. An entry that still has a legacy local path keeps it only
+ * when the form says so (`keep_legacy_video`); a new one cannot be typed in.
  */
 export const journalEntrySchema = z.object({
   slug: slugSchema,
@@ -563,15 +564,10 @@ export const journalEntrySchema = z.object({
   application: journalText("Uygulama", 400),
   observation: journalText("Gözlem", 600),
   outcome: journalText("Sonuç", 1000),
-  video_path: z
-    .string()
-    .trim()
-    .max(300, "Video yolu en fazla 300 karakter olabilir.")
-    .nullish()
-    .transform((v) => v || null)
-    .refine((v) => v == null || (/^\/[^/]/.test(v) && /\.(mp4|webm)$/i.test(v)), {
-      message: "Video yolu / ile başlamalı ve .mp4 ya da .webm ile bitmeli (ör. /images/not.mp4).",
-    }),
+  video_asset_id: z
+    .union([z.literal(""), z.null(), z.undefined(), uuid])
+    .transform((v) => v || null),
+  keep_legacy_video: z.boolean(),
   is_published: z.boolean(),
 })
 

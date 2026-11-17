@@ -72,7 +72,8 @@ export async function saveJournalEntryAction(_prev: ActionState, formData: FormD
       application: formData.get("application"),
       observation: formData.get("observation"),
       outcome: formData.get("outcome"),
-      video_path: textOrNull(formData, "video_path"),
+      video_asset_id: textOrNull(formData, "video_asset_id"),
+      keep_legacy_video: boolField(formData, "keep_legacy_video"),
       is_published: boolField(formData, "is_published"),
     })
     if (!parsed.success) {
@@ -108,7 +109,7 @@ export async function saveJournalEntryAction(_prev: ActionState, formData: FormD
 
     let savedId = entryId
     if (entryId) {
-      const { error } = await supabase.from("journal_entries").update(buildJournalUpdateRow(input)).eq("id", entryId)
+      const { error } = await supabase.from("journal_entries").update(buildJournalUpdateRow(input, before?.videoPath ?? null)).eq("id", entryId)
       if (error) return toActionState(error, "saveJournal:update")
     } else {
       const { data, error } = await supabase.from("journal_entries").insert(buildJournalRow(input)).select("id").single()

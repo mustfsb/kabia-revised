@@ -70,6 +70,21 @@ describe("mapJournalEntry", () => {
     assert.equal(entry.gallery[1].altText, "iki")
   })
 
+  it("a library video is served from the content-video bucket", async () => {
+    const { mapJournalEntry } = await import("../lib/journal.ts")
+    const entry = mapJournalEntry(
+      { ...ROW, video_path: null, video_bucket: "content-video", video_object_path: "journal/2026-11/hasat-abcdef12.mp4" } as never,
+      "https://proj.supabase.co",
+    )
+    assert.equal(entry.video, "https://proj.supabase.co/storage/v1/object/public/content-video/journal/2026-11/hasat-abcdef12.mp4")
+  })
+
+  it("a library video without a configured Supabase URL is left out, not broken", async () => {
+    const { mapJournalEntry } = await import("../lib/journal.ts")
+    const entry = mapJournalEntry({ ...ROW, video_path: null, video_bucket: "content-video", video_object_path: "journal/x.mp4" }, "")
+    assert.equal(entry.video, undefined)
+  })
+
   it("an entry with a video and no photo has neither photo nor gallery", async () => {
     const { mapJournalEntry } = await import("../lib/journal.ts")
     const entry = mapJournalEntry({

@@ -16,16 +16,19 @@ const valid = {
   application: "Yok — sadece gözlem",
   observation: "Dallar tomurcuktan çiçeğe dönüyor.",
   outcome: "Arılar bekleniyor.",
-  video_path: "",
+  video_asset_id: "",
+  keep_legacy_video: false,
   is_published: true,
 }
 
+const VIDEO_ID = "6f1c2b0a-3d4e-4f5a-8b6c-7d8e9f0a1b2c"
+
 describe("journalEntrySchema", () => {
-  it("accepts a complete entry and turns an empty video path into null", async () => {
+  it("accepts a complete entry and turns an empty video into null", async () => {
     const { journalEntrySchema } = await import("../lib/admin/schemas.ts")
     const parsed = journalEntrySchema.safeParse(valid)
     assert.ok(parsed.success, JSON.stringify(parsed.error?.issues))
-    assert.equal(parsed.data.video_path, null)
+    assert.equal(parsed.data.video_asset_id, null)
     assert.equal(parsed.data.entry_date, "2026-04-11")
   })
 
@@ -60,13 +63,13 @@ describe("journalEntrySchema", () => {
     assert.equal(journalEntrySchema.safeParse({ ...valid, slug: "onizleme-x" }).success, false)
   })
 
-  it("a video path is a local .mp4/.webm path, nothing else", async () => {
+  it("a video is a library asset id, never a typed path or URL", async () => {
     const { journalEntrySchema } = await import("../lib/admin/schemas.ts")
-    assert.ok(journalEntrySchema.safeParse({ ...valid, video_path: "/images/gunluk-2026-03-15-kaolin.mp4" }).success)
-    assert.ok(journalEntrySchema.safeParse({ ...valid, video_path: "/video/x.webm" }).success)
-    for (const bad of ["https://evil.example.com/x.mp4", "//evil.example.com/x.mp4", "/images/x.jpg", "images/x.mp4", "/images/x.mp4?x=1"]) {
-      assert.equal(journalEntrySchema.safeParse({ ...valid, video_path: bad }).success, false, bad)
+    assert.equal(journalEntrySchema.parse({ ...valid, video_asset_id: VIDEO_ID }).video_asset_id, VIDEO_ID)
+    for (const bad of ["/images/x.mp4", "https://evil.example.com/x.mp4", "not-a-uuid"]) {
+      assert.equal(journalEntrySchema.safeParse({ ...valid, video_asset_id: bad }).success, false, bad)
     }
+    assert.ok(!("video_path" in journalEntrySchema.shape), "a local path can no longer be typed in")
   })
 })
 
@@ -79,6 +82,21 @@ describe("journal row builders", () => {
     assert.ok(!("cover_image_url" in row))
     assert.equal(row.slug, valid.slug)
     assert.equal(row.entry_date, "2026-04-11")
+  })
+
+  it("a library video replaces the legacy path; keeping the legacy path needs an existing one", async () => {
+    const { buildJournalRow } = await import("../lib/admin/journal-fields.ts")
+    const { journalEntrySchema } = await import("../lib/admin/schemas.ts")
+    const legacy = "/images/gunluk-2026-03-15-kaolin.mp4"
+    const withAsset = buildJournalRow(journalEntrySchema.parse({ ...valid, video_asset_id: VIDEO_ID, keep_legacy_video: true }), legacy)
+    assert.equal(withAsset.video_asset_id, VIDEO_ID)
+    assert.equal(withAsset.video_path, null)
+    const kept = buildJournalRow(journalEntrySchema.parse({ ...valid, keep_legacy_video: true }), legacy)
+    assert.equal(kept.video_path, legacy)
+    const removed = buildJournalRow(journalEntrySchema.parse(valid), legacy)
+    assert.equal(removed.video_path, null)
+    const fresh = buildJournalRow(journalEntrySchema.parse({ ...valid, keep_legacy_video: true }))
+    assert.equal(fresh.video_path, null, "a new entry never gets a local path")
   })
 
   it("an update never writes the slug: it is immutable after creation", async () => {
@@ -170,5 +188,15 @@ describe("journal admin wiring", () => {
     assert.match(form, /<GalleryEditor/)
     assert.ok(!/name="cover_image_url"/.test(form))
     assert.match(form, /readOnly/, "the slug must not be editable once created")
+  })
+
+  it("the video is picked from the library, not typed", () => {
+    const form = readFileSync("app/admin/(protected)/journal/journal-form.tsx", "utf8")
+    const field = readFileSync("components/admin/media/video-field.tsx", "utf8")
+    assert.ok(!/name="video_path"/.test(form))
+    assert.match(form, /<VideoField/)
+    assert.match(field, /name="video_asset_id"/)
+    assert.match(field, /name="keep_legacy_video"/)
+    assert.match(field, /kind="video"/)
   })
 })

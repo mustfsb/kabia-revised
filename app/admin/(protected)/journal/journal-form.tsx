@@ -4,6 +4,7 @@ import { useActionState, useState } from "react"
 import Link from "next/link"
 import { saveJournalEntryAction } from "./actions"
 import { GalleryEditor } from "@/components/admin/media/gallery-editor"
+import { VideoField } from "@/components/admin/media/video-field"
 import { toPayload, type GalleryState } from "@/lib/admin/gallery"
 import { ACTION_IDLE } from "@/lib/admin/errors"
 import type { JournalDetail } from "@/lib/admin/queries/journal"
@@ -198,15 +199,13 @@ export function JournalForm({ entry }: { entry: JournalDetail | null }) {
 
           <Panel
             title="Video"
-            description="İsteğe bağlı. Video medya kütüphanesine yüklenmez; dosya projenin public klasöründe durur."
+            description="İsteğe bağlı. MP4 veya WebM, en fazla 50 MB. Video medya kütüphanesine yüklenir ve not sayfasında görsellerin altında oynatılır."
           >
-            <AdminInput
-              label="Video yolu"
-              name="video_path"
-              defaultValue={entry?.videoPath ?? ""}
-              maxLength={300}
-              error={errors.video_path}
-              hint="Örn. /images/gunluk-2026-03-15-kaolin.mp4 — yeni bir video için dosyanın koda eklenip dağıtılması gerekir."
+            <VideoField
+              initial={entry?.video ?? null}
+              legacyPath={entry?.videoPath ?? null}
+              folder="journal"
+              error={errors.video_asset_id}
             />
           </Panel>
         </div>

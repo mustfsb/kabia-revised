@@ -28,13 +28,19 @@ export const JOURNAL_WRITE_COLUMNS = [
   "observation",
   "outcome",
   "video_path",
+  "video_asset_id",
   "is_published",
 ] as const
 
 export type JournalWriteColumn = (typeof JOURNAL_WRITE_COLUMNS)[number]
 export type JournalRowWrite = Record<JournalWriteColumn, unknown>
 
-export function buildJournalRow(input: JournalEntryInput): JournalRowWrite {
+/**
+ * `legacyVideoPath` is the local path the entry already has (null for a new
+ * entry). It survives only while no library video is chosen and the form asked
+ * to keep it — so a path can be kept or removed, never introduced.
+ */
+export function buildJournalRow(input: JournalEntryInput, legacyVideoPath: string | null = null): JournalRowWrite {
   return {
     slug: input.slug,
     entry_date: input.entry_date,
@@ -44,14 +50,18 @@ export function buildJournalRow(input: JournalEntryInput): JournalRowWrite {
     application: input.application,
     observation: input.observation,
     outcome: input.outcome,
-    video_path: input.video_path,
+    video_path: input.video_asset_id || !input.keep_legacy_video ? null : legacyVideoPath,
+    video_asset_id: input.video_asset_id,
     is_published: input.is_published,
   }
 }
 
 /** The row an UPDATE writes: everything but the slug, which never changes. */
-export function buildJournalUpdateRow(input: JournalEntryInput): Omit<JournalRowWrite, "slug"> {
+export function buildJournalUpdateRow(
+  input: JournalEntryInput,
+  legacyVideoPath: string | null = null,
+): Omit<JournalRowWrite, "slug"> {
   return Object.fromEntries(
-    Object.entries(buildJournalRow(input)).filter(([column]) => column !== "slug"),
+    Object.entries(buildJournalRow(input, legacyVideoPath)).filter(([column]) => column !== "slug"),
   ) as Omit<JournalRowWrite, "slug">
 }
