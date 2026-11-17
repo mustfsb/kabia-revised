@@ -97,9 +97,9 @@ describe("object names", () => {
     assert.equal(mediaObjectName({ stem: "x", suffix: "aaaaaaaa", ext: "jpg", month: "2026-08" }), "2026-08/x-aaaaaaaa.jpg")
   })
 
-  it("only the three content folders are accepted", async () => {
+  it("only the four content folders are accepted", async () => {
     const { isMediaFolder, MEDIA_FOLDERS } = await import("../lib/admin/media.ts")
-    assert.deepEqual([...MEDIA_FOLDERS], ["products", "producers", "journal"])
+    assert.deepEqual([...MEDIA_FOLDERS], ["products", "producers", "journal", "slider"])
     assert.equal(isMediaFolder("products"), true)
     assert.equal(isMediaFolder("../etc"), false)
     assert.equal(isMediaFolder(""), false)
