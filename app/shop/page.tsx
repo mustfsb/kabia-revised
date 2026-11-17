@@ -11,9 +11,9 @@ import { SORT_OPTIONS } from "@/lib/store-listing";
 import { getCachedPublicProducts } from "@/lib/catalog";
 import { ALL_CATEGORIES, SOURCES, type ProductSource } from "@/lib/products";
 import { routes } from "@/lib/site";
-import { getPublicSettings } from "@/lib/settings";
-import { shopBannerVisible, type ShopBannerSettings } from "@/lib/shop-banner";
-import { ShopHeroBanner } from "@/components/shop/shop-hero-banner";
+import { getShopSliderView } from "@/lib/shop-slider-read";
+import { ShopSlider } from "@/components/shop/shop-slider";
+import { FeaturedProducts } from "@/components/shop/featured-products";
 import { BannerErrorBoundary } from "@/components/shop/banner-error-boundary";
 
 /** Filter and sort parameters the listing reads (see ShopPage below). */
@@ -103,16 +103,11 @@ export default async function ShopPage({
   searchParams: Promise<{ kategori?: string; kaynak?: string; sirala?: string }>;
 }) {
   const { kategori, kaynak, sirala } = await searchParams;
-  const settings = await getPublicSettings();
-  const banner: ShopBannerSettings = {
-    enabled: settings.shopBannerEnabled,
-    headline: settings.shopBannerHeadline,
-    subtext: settings.shopBannerSubtext,
-    imageUrl: settings.shopBannerImageUrl,
-    ctaLabel: settings.shopBannerCtaLabel,
-    ctaHref: settings.shopBannerCtaHref,
-  };
-  const showBanner = shopBannerVisible(banner);
+  // Awaited here rather than streamed: the slider is the top of the page, and
+  // popping it in after first paint would push the whole listing down. Both
+  // reads behind it are cached; a failed read is no slider, never an error.
+  const slider = isBrandPreview() ? null : await getShopSliderView();
+  const showBanner = slider !== null;
   const sort: SortOption = isSort(sirala) ? sirala : "onerilen";
   // Categories are rows now, and the grid that knows which ones exist streams
   // in behind Suspense — so membership cannot be checked here. What is checked
@@ -130,15 +125,10 @@ export default async function ShopPage({
 
   return (
     <PageShell>
-      {showBanner && (
+      {slider && (
         <BannerErrorBoundary>
-          <ShopHeroBanner
-            headline={banner.headline}
-            subtext={banner.subtext}
-            imageUrl={banner.imageUrl}
-            ctaLabel={banner.ctaLabel}
-            ctaHref={banner.ctaHref}
-          />
+          <ShopSlider view={slider} />
+          {slider.mode === "media" && <FeaturedProducts products={slider.below} />}
         </BannerErrorBoundary>
       )}
       <section aria-labelledby="shop-heading">

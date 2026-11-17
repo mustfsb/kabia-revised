@@ -63,7 +63,7 @@ export default async function ContentPage() {
       <div className="mb-6">
         <InlineAlert tone="info">
           Bu ekran bir sayfa oluşturucu değildir. Yalnızca işletmeyle birlikte değişen
-          bilgiler — mağaza slider'ı, duyuru, iletişim, sosyal hesaplar ve anasayfa seçkisi — düzenlenebilir.
+          bilgiler — mağaza slider&apos;ı, duyuru, iletişim, sosyal hesaplar ve anasayfa seçkisi — düzenlenebilir.
           Girilen metinler mağazada düz metin olarak gösterilir; HTML veya betik çalıştırılmaz.
         </InlineAlert>
       </div>

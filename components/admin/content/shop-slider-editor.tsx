@@ -332,7 +332,7 @@ export function ShopSliderEditor({ initial }: { initial: ShopSliderAdmin }) {
               <a href="/magaza" target="_blank" rel="noopener" className="text-sm text-ink/60 hover:text-brand">
                 Mağazada görüntüle
               </a>
-              <SubmitButton pendingLabel="Kaydediliyor…">Slider'ı kaydet</SubmitButton>
+              <SubmitButton pendingLabel="Kaydediliyor…">{"Slider'ı kaydet"}</SubmitButton>
             </div>
           </div>
         </div>

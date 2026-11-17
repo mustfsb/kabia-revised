@@ -2,6 +2,7 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   CERTIFICATION_LABEL,
+  discountPercent,
   formatTL,
   inStock,
   isOrganicCertified,
@@ -29,9 +30,12 @@ import { STOCK_BADGE_STYLE } from "@/lib/theme-engine/stock-badge-style";
 export function ProductEntry({
   product,
   priority = false,
+  featured = false,
 }: {
   product: Product;
   priority?: boolean;
+  /** A product the shop puts forward (the /magaza slider's featured list). */
+  featured?: boolean;
 }) {
   // Lean rows (related products) carry no variants, so stock is unknown
   // there — an unknown state must read as nothing, never as "out of stock".
@@ -41,6 +45,7 @@ export function ProductEntry({
   const organic = isOrganicCertified(product.certification);
   const discounted =
     product.originalPrice != null && product.originalPrice > product.price;
+  const percent = discountPercent(product.price, product.originalPrice);
 
   return (
     <li className="group">
@@ -72,7 +77,8 @@ export function ProductEntry({
           )}
         </div>
 
-        <div className="mt-5 border-t border-ink/10 pt-4">
+        <div className={featured ? "mt-5 border-t border-brand pt-4" : "mt-5 border-t border-ink/10 pt-4"}>
+          {featured && <p className="label mb-2 text-brand">Öne çıkan</p>}
           <p className="label text-olive">{product.categoryName && <>{product.categoryName} • </>}{product.source === "ciftlik" || !product.producerName || product.producerName === product.name ? sourceBadgeLabel(product.source) : product.producerName}</p>
           {organic && (
             <p className="label mt-2 text-brand">{CERTIFICATION_LABEL[product.certification]}</p>
@@ -92,6 +98,7 @@ export function ProductEntry({
                 {formatTL(product.originalPrice!)}
               </span>
             )}
+            {percent && <span className="label text-brand">%{percent} indirim</span>}
           </p>
           {outOfStock && <p className="mt-2 label text-clay">Stokta yok</p>}
         </div>
