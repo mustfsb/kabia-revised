@@ -8,6 +8,7 @@ import { toActionState, type ActionState } from "@/lib/admin/errors"
 import { mediaMetadataSchema } from "@/lib/admin/schemas"
 import { isMediaFolder, type MediaAsset, type MediaFolder } from "@/lib/admin/media"
 import { performMediaUpload } from "@/lib/admin/media-upload"
+import { finalizeVideoUpload, prepareVideoUpload } from "@/lib/admin/video-upload"
 import { loadMediaUsage, MediaUsageUnavailableError } from "@/lib/admin/queries/media"
 import { deleteBlockedMessage } from "@/lib/admin/media-usage"
 
@@ -40,6 +41,7 @@ async function revalidateMedia() {
   revalidatePath("/admin/products", "layout")
   revalidatePath("/admin/producers", "layout")
   revalidatePath("/admin/journal", "layout")
+  revalidatePath("/admin/content")
 }
 
 export async function uploadMediaAction(
@@ -97,6 +99,68 @@ export async function uploadMediaAction(
     }
   } catch (error) {
     return toActionState(error, "uploadMedia")
+  }
+}
+
+function parseFolder(raw: unknown): MediaFolder | null | undefined {
+  if (raw === null || raw === undefined || raw === "") return null
+  return isMediaFolder(raw) ? raw : undefined
+}
+
+/**
+ * Step 1 of a video upload: a signed URL the browser uploads to directly.
+ * Videos are too large for a server-action body (see lib/admin/video-upload.ts).
+ */
+export async function createVideoUploadAction(input: {
+  filename: string
+  size: number
+  type: string
+  folder?: string | null
+}): Promise<{ ok: true; path: string; token: string } | { ok: false; message: string }> {
+  try {
+    const { supabase } = await adminContext("manageMedia")
+    const folder = parseFolder(input?.folder)
+    if (folder === undefined) return { ok: false, message: "Geçersiz yükleme klasörü." }
+    const result = await prepareVideoUpload(supabase, {
+      filename: String(input?.filename ?? ""),
+      size: Number(input?.size),
+      type: String(input?.type ?? ""),
+      folder,
+    })
+    if (result.ok) return result
+    if (result.kind === "invalid") return { ok: false, message: result.message }
+    const state = toActionState(result.error, result.context)
+    return { ok: false, message: state.message ?? "Yükleme başlatılamadı." }
+  } catch (error) {
+    const state = toActionState(error, "createVideoUpload")
+    return { ok: false, message: state.message ?? "Yükleme başlatılamadı." }
+  }
+}
+
+/** Step 2: prove the uploaded object is a video, then catalogue it. */
+export async function finalizeVideoUploadAction(input: { path: string; filename: string }): Promise<UploadResult> {
+  try {
+    const { session, supabase } = await adminContext("manageMedia")
+    const result = await finalizeVideoUpload(supabase, {
+      path: String(input?.path ?? ""),
+      filename: String(input?.filename ?? ""),
+      userId: session.userId,
+    })
+    if (!result.ok) {
+      return result.kind === "invalid" ? { ok: false, message: result.message } : toActionState(result.error, result.context)
+    }
+    const { asset, path, url } = result
+    const audited = await logAdminAction(supabase, {
+      action: "media.upload",
+      entityType: "media",
+      entityId: asset.id,
+      after: { path, size: asset.fileSize, mime_type: asset.mimeType },
+      metadata: { original_filename: asset.originalFilename, bucket: asset.bucketId },
+    })
+    await revalidateMedia()
+    return { ok: true, id: asset.id, url, path, asset, message: "Video yüklendi.", warning: audited ? undefined : AUDIT_WARNING }
+  } catch (error) {
+    return toActionState(error, "finalizeVideoUpload")
   }
 }
 

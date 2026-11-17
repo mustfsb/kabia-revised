@@ -2,16 +2,16 @@
 
 import { useCallback, useEffect, useId, useRef, useState } from "react"
 import { Check, Search, Upload, X } from "lucide-react"
-import { uploadMediaAction } from "@/app/admin/(protected)/media/actions"
+import { uploadLibraryFile } from "@/components/admin/media/upload-file"
 import { MediaThumb } from "@/components/admin/media/media-thumb"
 import { AdminButton } from "@/components/admin/ui/form"
-import { ACTION_IDLE } from "@/lib/admin/errors"
 import {
-  clientFileProblem,
   formatBytes,
   formatDimensions,
+  isVideoMime,
   MEDIA_ACCEPT,
   MEDIA_MIME_LABELS,
+  VIDEO_ACCEPT,
   MEDIA_PAGE_SIZE,
   type MediaAsset,
   type MediaFolder,
@@ -51,6 +51,24 @@ interface PickerState {
 
 const EMPTY: PickerState = { assets: [], total: 0, page: 1, loading: false, error: null }
 
+/** What a picker may offer: images (the default, every existing caller), videos, or both. */
+export type PickerKind = "image" | "video" | "any"
+
+const KIND_COPY: Record<PickerKind, { noun: string; accept: string; hint: string; group: string }> = {
+  image: { noun: "görsel", accept: MEDIA_ACCEPT, hint: "JPEG, PNG, WebP veya AVIF · en fazla 4 MB", group: "gorsel" },
+  video: { noun: "video", accept: VIDEO_ACCEPT, hint: "MP4 veya WebM · en fazla 50 MB", group: "video" },
+  any: {
+    noun: "medya",
+    accept: `${MEDIA_ACCEPT},${VIDEO_ACCEPT}`,
+    hint: "Görsel: JPEG, PNG, WebP, AVIF, en fazla 4 MB · Video: MP4, WebM, en fazla 50 MB",
+    group: "",
+  },
+}
+
+function mimeAllowed(kind: PickerKind, mime: string): boolean {
+  return kind === "any" || (kind === "video") === isVideoMime(mime)
+}
+
 export function MediaPicker({
   open,
   onClose,
@@ -59,6 +77,7 @@ export function MediaPicker({
   isAttached,
   folder,
   title = "Medyadan seç",
+  kind = "image",
 }: {
   open: boolean
   onClose: () => void
@@ -69,7 +88,9 @@ export function MediaPicker({
   /** Where uploads made from this dialog are filed in the bucket. */
   folder?: MediaFolder
   title?: string
+  kind?: PickerKind
 }) {
+  const copy = KIND_COPY[kind]
   const dialogRef = useRef<HTMLDialogElement>(null)
   const searchId = useId()
   const uploadId = useId()
@@ -109,6 +130,7 @@ export function MediaPicker({
         const params = new URLSearchParams({ page: String(page) })
         if (search.trim().length >= 2) params.set("q", search.trim())
         if (mime) params.set("tur", mime)
+        else if (copy.group) params.set("tur", copy.group)
 
         const response = await fetch(`/admin/media/api?${params}`, {
           cache: "no-store",
@@ -131,7 +153,7 @@ export function MediaPicker({
         }))
       }
     },
-    [],
+    [copy.group],
   )
 
   // Debounced: typing "badem" issues one request, not five.
@@ -168,18 +190,14 @@ export function MediaPicker({
     let failure: string | null = null
 
     for (const file of files) {
-      const problem = clientFileProblem(file)
-      if (problem) {
-        failure = problem
+      if (!mimeAllowed(kind, file.type)) {
+        failure = `${file.name}: burada yalnızca ${copy.noun} seçilebilir.`
         continue
       }
-      const data = new FormData()
-      data.set("file", file)
-      if (folder) data.set("folder", folder)
       try {
-        const result = await uploadMediaAction(ACTION_IDLE, data)
-        if (result.ok && result.asset) uploaded.push(result.asset)
-        else failure = `${file.name}: ${result.message ?? "Yükleme başarısız."}`
+        const result = await uploadLibraryFile(file, folder)
+        if (result.ok) uploaded.push(result.asset)
+        else failure = result.message.startsWith(file.name) ? result.message : `${file.name}: ${result.message}`
       } catch {
         failure = `${file.name}: Yükleme sırasında bir hata oluştu. Tekrar deneyin.`
       }
@@ -204,7 +222,7 @@ export function MediaPicker({
     setUploadMessage(
       failure
         ? { tone: "error", text: failure }
-        : { tone: "ok", text: uploaded.length === 1 ? "Görsel yüklendi ve seçildi." : `${uploaded.length} görsel yüklendi ve seçildi.` },
+        : { tone: "ok", text: uploaded.length === 1 ? "Dosya yüklendi ve seçildi." : `${uploaded.length} dosya yüklendi ve seçildi.` },
     )
     setUploading(false)
   }
@@ -228,8 +246,8 @@ export function MediaPicker({
             </h2>
             <p className="mt-0.5 text-xs text-ink/50">
               {multiple
-                ? "Bir veya daha fazla görsel seçebilirsiniz."
-                : "Bir görsel seçin."}
+                ? `Bir veya daha fazla ${copy.noun} seçebilirsiniz.`
+                : `Bir ${copy.noun} seçin.`}
             </p>
           </div>
           <button
@@ -274,7 +292,7 @@ export function MediaPicker({
               className="min-h-11 cursor-pointer rounded-[3px] border border-ink/15 bg-ivory px-3 pr-8 text-sm text-ink focus:border-brand focus:outline-none focus:ring-1 focus:ring-brand/40"
             >
               <option value="">Tüm türler</option>
-              {Object.entries(MEDIA_MIME_LABELS).map(([value, label]) => (
+              {Object.entries(MEDIA_MIME_LABELS).filter(([value]) => mimeAllowed(kind, value)).map(([value, label]) => (
                 <option key={value} value={value}>
                   {label}
                 </option>
@@ -283,19 +301,19 @@ export function MediaPicker({
           </div>
 
           <p className="ml-auto text-xs text-ink/50" aria-live="polite">
-            {selected.size > 0 ? `${selected.size} görsel seçildi` : "Seçim yok"}
+            {selected.size > 0 ? `${selected.size} ${copy.noun} seçildi` : "Seçim yok"}
           </p>
         </div>
 
         <div className="border-b border-ink/10 px-5 py-3">
           <label htmlFor={uploadId} className="label mb-1.5 block text-olive">
-            Yeni görsel yükle
+            Yeni {copy.noun} yükle
           </label>
           <div className="flex flex-wrap items-center gap-3">
             <input
               id={uploadId}
               type="file"
-              accept={MEDIA_ACCEPT}
+              accept={copy.accept}
               multiple={multiple}
               disabled={uploading}
               className="block w-full max-w-sm text-sm text-ink/70 file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-full file:border file:border-ink/20 file:bg-transparent file:px-4 file:text-sm file:text-ink hover:file:border-brand hover:file:text-brand disabled:opacity-60"
@@ -317,7 +335,7 @@ export function MediaPicker({
               <Upload className="h-4 w-4 text-ink/30" aria-hidden="true" />
             )}
           </div>
-          <p className="mt-1.5 text-xs text-ink/45">JPEG, PNG, WebP veya AVIF · en fazla 4 MB</p>
+          <p className="mt-1.5 text-xs text-ink/45">{copy.hint}</p>
           {uploadMessage && (
             <p
               role={uploadMessage.tone === "error" ? "alert" : "status"}
@@ -339,11 +357,11 @@ export function MediaPicker({
             <div className="py-12 text-center">
               <p className="text-sm text-ink/60">
                 {query || mimeType
-                  ? "Aramanızla eşleşen görsel yok."
-                  : "Kütüphanede henüz görsel yok."}
+                  ? `Aramanızla eşleşen ${copy.noun} yok.`
+                  : `Kütüphanede henüz ${copy.noun} yok.`}
               </p>
               <p className="mt-1.5 text-xs text-ink/40">
-                Yukarıdaki alandan yeni görsel yükleyebilirsiniz.
+                Yukarıdaki alandan yeni {copy.noun} yükleyebilirsiniz.
               </p>
             </div>
           )}
@@ -424,7 +442,7 @@ export function MediaPicker({
             Vazgeç
           </AdminButton>
           <AdminButton onClick={confirm} disabled={selected.size === 0}>
-            {selected.size > 0 ? `${selected.size} görseli ekle` : "Seçimi onayla"}
+            {selected.size > 0 ? `${selected.size} ${copy.noun} ekle` : "Seçimi onayla"}
           </AdminButton>
         </div>
       </div>

@@ -29,6 +29,8 @@ export type MediaSort = "newest" | "oldest" | "name" | "largest"
 export interface MediaQuery {
   search?: string
   mimeType?: string
+  /** Restrict to images or videos (a picker that takes one kind). */
+  kind?: "image" | "video"
   sort?: MediaSort
   page?: number
   pageSize?: number
@@ -109,6 +111,7 @@ export async function loadMediaPage(
   }
 
   if (query.mimeType) builder = builder.eq("mime_type", query.mimeType)
+  if (query.kind) builder = builder.like("mime_type", query.kind === "video" ? "video/%" : "image/%")
 
   switch (query.sort) {
     case "oldest":

@@ -38,12 +38,15 @@ export async function GET(request: NextRequest) {
 
     const rawMime = params.get("tur")
     const mimeType = rawMime && MEDIA_MIME_LABELS[rawMime] ? rawMime : undefined
+    // A picker that only takes one kind asks for the group, not a single type.
+    const kind = rawMime === "gorsel" ? "image" : rawMime === "video" ? "video" : undefined
 
     const search = params.get("q")?.slice(0, 80) || undefined
 
     const result = await loadMediaPage(supabase, {
       search,
       mimeType,
+      kind,
       sort,
       page,
       pageSize: MEDIA_PAGE_SIZE,

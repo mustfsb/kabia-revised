@@ -14,6 +14,7 @@ import { AdminButton, AdminInput, FormMessage, SubmitButton } from "@/components
 import {
   formatBytes,
   formatDimensions,
+  isVideoMime,
   MEDIA_MIME_LABELS,
   type MediaAsset,
   type MediaUsage,
@@ -130,13 +131,25 @@ export function MediaPreviewDialog({
 
         <div className="grid gap-5 p-5 md:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
           <div className="relative aspect-[4/3] overflow-hidden rounded-[3px] bg-ink/[0.05]">
-            <Image
-              src={asset.url}
-              alt={asset.altText ?? asset.label}
-              fill
-              sizes="(min-width: 768px) 32rem, 90vw"
-              className="object-contain"
-            />
+            {isVideoMime(asset.mimeType) ? (
+              <video
+                src={asset.url}
+                controls
+                muted
+                playsInline
+                preload="metadata"
+                aria-label={asset.altText ?? asset.label}
+                className="absolute inset-0 h-full w-full object-contain"
+              />
+            ) : (
+              <Image
+                src={asset.url}
+                alt={asset.altText ?? asset.label}
+                fill
+                sizes="(min-width: 768px) 32rem, 90vw"
+                className="object-contain"
+              />
+            )}
           </div>
 
           <div className="space-y-5">

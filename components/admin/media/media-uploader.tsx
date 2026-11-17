@@ -3,10 +3,10 @@
 import { useCallback, useId, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Upload, Check, X, AlertCircle } from "lucide-react"
-import { uploadMediaAction } from "@/app/admin/(protected)/media/actions"
+import { uploadLibraryFile } from "@/components/admin/media/upload-file"
 import { Panel } from "@/components/admin/ui/surfaces"
 import { AdminButton } from "@/components/admin/ui/form"
-import { MEDIA_ACCEPT, MEDIA_UPLOAD_MAX_BYTES, formatBytes } from "@/lib/admin/media"
+import { clientFileProblem, formatBytes, isVideoMime, MEDIA_ACCEPT, VIDEO_ACCEPT } from "@/lib/admin/media"
 import { cn } from "@/lib/utils"
 
 /**
@@ -37,13 +37,8 @@ interface QueueItem {
   message?: string
 }
 
-const ACCEPTED = new Set(MEDIA_ACCEPT.split(","))
-
 function preflight(file: File): string | null {
-  if (file.size === 0) return "Dosya boş."
-  if (file.size > MEDIA_UPLOAD_MAX_BYTES) return `Dosya 4 MB sınırını aşıyor (${formatBytes(file.size)}). Görseli küçültüp yeniden yükleyin.`
-  if (!ACCEPTED.has(file.type)) return "Yalnızca JPEG, PNG, WebP ve AVIF görselleri yüklenebilir."
-  return null
+  return clientFileProblem(file, isVideoMime(file.type) ? "video" : "image")
 }
 
 export function MediaUploader() {
@@ -84,11 +79,8 @@ export function MediaUploader() {
         }
 
         update(item.key, { status: "uploading" })
-        const data = new FormData()
-        data.set("file", file)
-
         try {
-          const result = await uploadMediaAction({ ok: false }, data)
+          const result = await uploadLibraryFile(file)
           if (result.ok) {
             anySucceeded = true
             update(item.key, { status: "done", message: undefined })
@@ -122,8 +114,8 @@ export function MediaUploader() {
 
   return (
     <Panel
-      title="Görsel yükle"
-      description="JPEG, PNG, WebP veya AVIF · en fazla 4 MB · birden fazla dosya seçilebilir"
+      title="Görsel veya video yükle"
+      description="Görsel: JPEG, PNG, WebP veya AVIF, en fazla 4 MB · Video: MP4 veya WebM, en fazla 50 MB · birden fazla dosya seçilebilir"
     >
       <div
         onDragEnter={(event) => {
@@ -146,7 +138,7 @@ export function MediaUploader() {
         <Upload className="mx-auto h-6 w-6 text-ink/30" aria-hidden="true" />
 
         <p className="mt-3 text-sm text-ink/70">
-          Görselleri buraya sürükleyin ya da{" "}
+          Görselleri veya videoları buraya sürükleyin ya da{" "}
           <label
             htmlFor={inputId}
             className="cursor-pointer rounded-[2px] font-medium text-brand underline underline-offset-4 focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-brand hover:text-forest"
@@ -163,7 +155,7 @@ export function MediaUploader() {
           id={inputId}
           type="file"
           multiple
-          accept={MEDIA_ACCEPT}
+          accept={`${MEDIA_ACCEPT},${VIDEO_ACCEPT}`}
           className="sr-only"
           onChange={(event) => {
             const files = [...(event.target.files ?? [])]
