@@ -99,6 +99,14 @@ function buildCsp(nonce: string, isDev: boolean): string {
     "data:", // next/font inlines font data
   ].join(" ")
 
+  // Video in the content-video bucket is served from the Supabase origin;
+  // without this the browser falls back to default-src 'self' and blocks it.
+  const mediaSrc = [
+    "'self'",
+    sbOrigin ?? "https://*.supabase.co",
+    "blob:",
+  ].join(" ")
+
   const frameSrc = ["'self'"].join(" ")
   const workerSrc = ["'self'", "blob:"].join(" ")
   const manifestSrc = ["'self'"].join(" ")
@@ -110,6 +118,7 @@ function buildCsp(nonce: string, isDev: boolean): string {
     `img-src ${imgSrc}`,
     `font-src ${fontSrc}`,
     `connect-src ${connectSrc}`,
+    `media-src ${mediaSrc}`,
     `frame-src ${frameSrc}`,
     `worker-src ${workerSrc}`,
     `manifest-src ${manifestSrc}`,

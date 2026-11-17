@@ -138,3 +138,14 @@ describe("SEC-09 security headers", () => {
     assert.ok(true, "HSTS is gated on !isDev in the proxy")
   })
 })
+describe("media-src for Storage-hosted video", () => {
+  it("proxy.ts allows video from this project's Supabase origin, nothing broader", async () => {
+    const { readFileSync } = await import("node:fs")
+    const src = readFileSync("proxy.ts", "utf8")
+    assert.match(src, /`media-src \$\{mediaSrc\}`/, "the CSP has no media-src directive")
+    const block = /const mediaSrc = \[([\s\S]*?)\]/.exec(src)?.[1] ?? ""
+    assert.match(block, /"'self'"/)
+    assert.match(block, /sbOrigin/)
+    assert.doesNotMatch(block, /"https:"|\*"/, "media-src must not allow any https host")
+  })
+})
