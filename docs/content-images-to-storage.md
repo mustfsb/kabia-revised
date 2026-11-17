@@ -50,7 +50,18 @@ default (`next.config.ts` raises it to 4.5 MB). Before this change any upload ov
 failed with a 413 while the UI promised 10 MB. To accept larger originals, uploads would
 have to go straight to Storage (signed upload URLs) instead of through the app.
 
-## Known limitation: journal video
+## Journal video — resolved 2026-11-17
+
+Journal videos now come from the media library: `content-video` bucket (public, 50 MB,
+MP4/WebM), uploaded browser → Storage with a signed URL and probed on the server before
+they are catalogued (`lib/admin/video-upload.ts`). `journal_entries.video_asset_id` links
+the entry; a trigger copies bucket and path so the public page needs no access to
+`media_assets`. The CSP has a `media-src` for the Supabase origin. The kaolin entry keeps
+its local `video_path`, which the editor can keep or remove but never retype. Migration:
+`20261117000000_content_video.sql`. The section below is kept as the record of what was
+planned.
+
+### Was: known limitation: journal video
 
 A journal entry's video is a local path (`journal_entries.video_path`, `/images/*.mp4|webm`),
 so **a new journal entry with a video cannot be created from admin without a code change**:

@@ -50,6 +50,34 @@ behind; a super admin's delete also purges the row.
 
 ---
 
+## Videos
+
+Upload from **Medya** or from any video picker (journal entry, shop slider). MP4 or
+WebM, **at most 50 MB**. The file goes straight from the browser to the `content-video`
+bucket, then the server checks its first bytes; a file that is not really a video is
+removed and refused with *"Dosya içeriği geçerli bir video değil."* A video in use by a
+journal entry or a slide cannot be deleted, like an image.
+
+An upload interrupted between the transfer and the check can leave an uncatalogued
+object in `content-video`. It is invisible to the site; remove it from the Supabase
+dashboard if it matters.
+
+## Shop slider — `/admin/content`
+
+The top of `/magaza`. Three modes:
+
+- **Kapalı** — no slider.
+- **Medya slider'ı** — up to 6 slides, photo or video, each with an optional headline and
+  one in-site button (`/…` links only). A video slide can have a cover image. Optionally
+  the first 3 featured products appear under the slider as marked cards.
+- **Öne çıkan ürünler** — up to 12 published products, each a slide with image, price and
+  discount.
+
+Slides advance every 5 seconds and pause on hover, focus and for reduced motion. Both
+lists are kept when the mode changes, and the whole slider saves in one transaction.
+This selection is separate from the homepage selection. It replaced the old single shop
+banner; the `shop_banner_*` settings stay in the table but nothing reads them any more.
+
 ## Product images
 
 In **Ürün oluştur** and **Ürün düzenle**, under *Görseller*:
