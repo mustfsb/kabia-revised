@@ -1,5 +1,6 @@
 import Link from "next/link"
 import type { ReactNode } from "react"
+import { cn } from "@/lib/utils"
 import { Breadcrumbs, type Crumb } from "@/components/layout/breadcrumbs"
 
 /**
@@ -151,9 +152,18 @@ export function GuideFacts({ facts }: { facts: readonly { label: string; value: 
  * A listing page's second intro paragraph: the first paragraph's own style,
  * with the guide link set like /ciftlik's inline certificate link.
  */
-export function ListingIntro({ text, link }: { text: string; link: { href: string; label: string } }) {
+export function ListingIntro({
+  text,
+  link,
+  className,
+}: {
+  text: string
+  link: { href: string; label: string }
+  /** Overrides the default measure (tailwind-merge), e.g. a wider max-w on one page. */
+  className?: string
+}) {
   return (
-    <p className="mt-4 max-w-md text-base leading-relaxed text-ink/65">
+    <p className={cn("mt-4 max-w-md text-base leading-relaxed text-ink/65", className)}>
       {text}{" "}
       <Link
         href={link.href}

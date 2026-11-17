@@ -97,3 +97,12 @@ describe("slider overlay in dark mode", () => {
     }
   })
 })
+
+describe("/magaza intro width", () => {
+  it("both intro paragraphs are max-w-xl on the shop page only", () => {
+    assert.match(page, /<p className="mt-7 max-w-xl text-base/)
+    assert.match(page, /<ListingIntro \{\.\.\.listingIntros\.magaza\} className="max-w-xl" \/>/)
+    const parts = readFileSync("components/guides/guide-parts.tsx", "utf8")
+    assert.match(parts, /cn\("mt-4 max-w-md text-base leading-relaxed text-ink\/65", className\)/, "other listing pages keep max-w-md")
+  })
+})
