@@ -140,11 +140,11 @@ export default async function ShopPage({
           >
             <em className="font-theme-display italic text-brand">Mağaza</em>.
           </h1>
-          <p className="mt-7 max-w-xl text-base leading-relaxed text-ink/65">
+          <p className="mt-7 max-w-[37.25rem] text-base leading-relaxed text-ink/65">
             Önce hikâyesini okumanızı isteriz — nereden geldiğini, neden
             Kabia&apos;da olduğunu. Sonra hasattan dilediğinizi seçebilirsiniz.
           </p>
-          <ListingIntro {...listingIntros.magaza} className="max-w-xl" />
+          <ListingIntro {...listingIntros.magaza} className="max-w-[37.25rem]" />
         </div>
 
         <div className="wrap mt-14 md:mt-20">
