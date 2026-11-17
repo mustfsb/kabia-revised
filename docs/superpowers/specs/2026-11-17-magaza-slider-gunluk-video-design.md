@@ -2,7 +2,7 @@
 
 **Tarih:** 2026-11-17
 **Branch:** `feat/shop-slider-journal-video` (worktree `/Users/mustafa/kabia-slider-video`)
-**Durum:** Onay bekliyor
+**Durum:** Onaylandı (2026-11-17), otomatik kayma ve 12 ürün değişikliğiyle
 
 ## Amaç
 
@@ -16,7 +16,7 @@ Tasarım sade ve minimal kalır, sitenin mevcut diliyle uyumludur. Fazlası ekle
 
 ## Hedef dışı / anti-hedefler
 
-- Slaytların otomatik akması, parallax, büyük geçiş animasyonları. Hareket, sitenin mevcut kısa opaklık/kaydırma dilini aşmaz.
+- Parallax ve büyük geçiş animasyonları. Hareket, 5 saniyede bir yapılan yumuşak bir kaydırmadan ibarettir.
 - Yeni bir carousel kütüphanesi veya bağımlılık.
 - Üretici mağaza sayfalarında (`/magaza/[üretici]`) slider. Yalnızca `/magaza`'da olur.
 - Sayfa kurucusu: renk, yazı tipi ve yerleşim kodda kalır. Admin yalnızca içerik ve seçimleri yönetir.
@@ -92,12 +92,12 @@ Kurucu için notlar:
   - `headline text null` (≤ 80), `alt_text text null` (≤ 200)
   - `link_href text null`, `link_label text null` (≤ 30); ikisi birlikte dolu ya da birlikte boş. `link_href` site içi bir yol (`/…`) olmalıdır; mevcut `url-settings` kuralları uygulanır.
   - `sort_order int not null`
-- `shop_featured_products`: `product_id uuid not null references products on delete cascade unique`, `sort_order int not null check (sort_order between 0 and 2) unique`. En fazla 3 ürün.
+- `shop_featured_products`: `product_id uuid not null references products on delete cascade unique`, `sort_order int not null check (sort_order between 0 and 11) unique`. En fazla 12 ürün. Ürün modunda hepsi slayttır; medya modunda ilk 3'ü slider'ın altında gösterilir.
 - `admin_save_shop_slider(p_mode, p_show_featured_below, p_slides jsonb, p_featured uuid[])`: `security definer`. Gövdede `has_admin_role` ve `manageContent` yetkisi yeniden türetilir (mevcut RPC'lerin deseni). Dördü tek transaction'da yazılır. Kontroller:
   - slayt sayısı ≤ 6
   - medya asset'leri var ve silinmemiş
   - poster bir görsel
-  - ürünler aktif ve sayıları ≤ 3
+  - ürünler aktif ve sayıları ≤ 12
   - `mode = 'products'` iken en az 1 ürün, `mode = 'media'` iken en az 1 slayt
 
   Denetim kaydı önce/sonra durumuyla yazılır.
@@ -121,13 +121,15 @@ Konum, sayfanın en üstüdür: `PageShell` içinde, "Mağaza" başlığından �
       ┌─────────┐  ┌─────────┐  ┌─────────┐   ← grid ile aynı kenarlar
 ```
 
-**Oklar.** Slider'ın dışında, sağ ve soldaki boşlukta, dikeyde ortalı durur. Ekran bunlara yer bırakmayacak kadar darsa (yaklaşık 1320px altı, mobil dahil) oklar slaytın iç kenarına, yarı saydam küçük daire butonlar olarak biner. Tek slayt varsa ok gösterilmez. Oklar ilk ve son slaytta pasifleşir; başa sarma yoktur.
+**Oklar.** Slider'ın dışında, sağ ve soldaki boşlukta, dikeyde ortalı durur. Ekran bunlara yer bırakmayacak kadar darsa (yaklaşık 1320px altı, mobil dahil) oklar slaytın iç kenarına, yarı saydam küçük daire butonlar olarak biner. Tek slayt varsa ok gösterilmez. Son slayttan sonra başa döner (otomatik kayma için).
 
-**Davranış.** Yatay `scroll-snap` kabı kullanılır. Dokunmatikte kaydırma doğal çalışır; oklar bir slayt ilerletir. Slaytlar kendiliğinden geçmez. Erişilebilirlik: `aria-roledescription="carousel"`, her slayt "1 / 3" etiketli, oklar `aria-label` taşır ve klavyeyle kullanılabilir. `prefers-reduced-motion` açıkken kaydırma animasyonsuz olur. Küçük bir "1 / 3" sayacı slaytın alt köşesinde durur; nokta dizisi yoktur.
+**Davranış.** Yatay `scroll-snap` kabı kullanılır. Dokunmatikte kaydırma doğal çalışır; oklar bir slayt ilerletir.
+
+**Otomatik kayma.** Slider her 5 saniyede bir slayt ilerler. Bu, medya modunda medya slaytları için, ürün modunda ürün slaytları için geçerlidir. Medya modunda slider'ın altındaki 3 öne çıkan ürün sabit kartlardır, kaymaz. Kullanıcı imleçle üstüne geldiğinde, klavyeyle odaklandığında, dokunarak kaydırdığında veya sekme görünmezken zamanlayıcı durur. Elle geçişten sonra 5 saniye yeniden başlar. WCAG 2.2.2 için slider'da tek bir oynat/duraklat butonu bulunur; video slaytları da bu butonla durur. `prefers-reduced-motion` açıksa otomatik kayma kapalı başlar. Erişilebilirlik: `aria-roledescription="carousel"`, her slayt "1 / 3" etiketli, oklar `aria-label` taşır ve klavyeyle kullanılabilir. `prefers-reduced-motion` açıkken kaydırma animasyonsuz olur. Küçük bir "1 / 3" sayacı slaytın alt köşesinde durur; nokta dizisi yoktur.
 
 **Medya slaytı.** Oran desktop'ta 16:7, mobilde 4:5; `object-cover`. Başlık veya link varsa alt kısma hafif bir koyu geçiş gelir (bugünkü banner'ın geçişi) ve üstüne başlık ile tek bir buton yerleşir. İkisi de yoksa geçiş de olmaz, yalnızca medya görünür.
 
-Video slayt etkinken ve ekrandayken `muted loop playsInline autoplay` oynar, değilse duraklar (IntersectionObserver). `prefers-reduced-motion` veya `saveData` açıksa video oynamaz; poster görünür, poster yoksa videonun ilk karesi (`preload="metadata"`). Video slaytlarında küçük bir oynat/duraklat butonu vardır (WCAG 2.2.2).
+Video slayt etkinken ve ekrandayken `muted loop playsInline autoplay` oynar, değilse duraklar (IntersectionObserver). `prefers-reduced-motion` veya `saveData` açıksa video oynamaz; poster görünür, poster yoksa videonun ilk karesi (`preload="metadata"`). Ayrı bir video butonu yoktur; slider'ın oynat/duraklat butonu videoyu da durdurur.
 
 **Ürün slaytı** (`products` modu):
 
@@ -153,7 +155,7 @@ Banner formunun yerine gelir:
 
 - **Gösterim:** Kapalı · Medya slider'ı · Öne çıkan ürünler (radyo).
 - **Slaytlar** (medya modunda): **Medyadan seç** (görsel ve video), **Yeni yükle**. Liste satırlarında küçük önizleme, başlık, link yolu, buton yazısı, alt metin, video için "Kapak görseli seç", **Yukarı / Aşağı**, **Kaldır** yer alır. En fazla 6 slayt. Galeri editörünün satır deseni kullanılır.
-- **Öne çıkan ürünler:** en fazla 3 ürün, aranabilir seçici (yalnızca aktif ürünler), sıralama ve kaldırma. Medya modunda "Slider'ın altında göster" anahtarı bulunur.
+- **Öne çıkan ürünler:** en fazla 12 ürün, aranabilir seçici (yalnızca aktif ürünler), sıralama ve kaldırma. Medya modunda "Slider'ın altında göster" anahtarı bulunur ve listenin ilk 3 ürününün gösterileceği yazılır.
 - **Kaydet:** tek RPC ile kaydedilir. Doğrulama hataları alan alan gösterilir, seçimler kaybolmaz. Ayrıca "Mağazada görüntüle" linki bulunur.
 
 Mevcut ana sayfa seçkisi (`IntroProductsForm`, `is_featured`) değişmez. O ana sayfanın, bu mağazanın seçimidir ve paneldeki metinler ikisini karıştırmayacak şekilde yazılır.
@@ -182,10 +184,10 @@ Canlı doğrulama, migration'lardan sonra salt okunur sorgularla yapılır. Admi
 
 Bileşen dosya adları, sorgu ayrıntıları, tam Tailwind sınıfları (mevcut tokenlarla), ok ikonları (`lucide-react`) ve ilerleme göstergesinin görünümü.
 
-## Benim kararlarım (kullanıcı onayına sunulan)
+## Kararlar (kullanıcı onayladı)
 
-1. Slaytlar kendiliğinden geçmez; yalnızca oklar ve kaydırma ile değişir.
-2. Öne çıkan ürün sayısı 1–3 arası; tam 3 zorunlu değil.
+1. Kullanıcı kararı: slaytlar 5 saniyede bir otomatik kayar (medya ve ürün modunda); altındaki 3 ürün kaymaz.
+2. Kullanıcı kararı: ürün slider'ında en fazla 12 ürün. Medya modunda altta listenin ilk 3'ü gösterilir (benim kararım: tek liste).
 3. En fazla 6 medya slaytı.
 4. Video sınırı 50 MB, MP4/WebM.
 5. Mevcut banner slider'a dönüştürülür (koşullar 3. bölümde).
