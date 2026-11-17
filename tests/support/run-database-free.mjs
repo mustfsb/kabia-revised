@@ -20,7 +20,7 @@ const files = [
   "journal-reads", "admin-journal", "admin-gallery", "admin-gallery-save", "media-upload", "media-usage", "media-migration",
   "floating-contact",
   "admin-inbox",
-  "shop-slider-migration", "video-probe", "video-upload", "shop-slider",
+  "shop-slider-migration", "video-probe", "video-upload", "shop-slider", "shop-slider-admin",
 ].map(name => `tests/${name}.test.ts`);
 files.push("tests/client-boundary.test.js");
 const env = { ...process.env };

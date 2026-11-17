@@ -10,6 +10,8 @@ import { EmptyState, InlineAlert, PageHeader, Panel } from "@/components/admin/u
 import { PublishTag } from "@/components/admin/ui/status"
 import { SettingsGroupForm } from "../settings/settings-form"
 import { IntroProductsForm } from "@/components/admin/content/intro-products-form"
+import { ShopSliderEditor } from "@/components/admin/content/shop-slider-editor"
+import { loadShopSliderAdmin } from "@/lib/admin/queries/shop-slider"
 import { toggleFeaturedAction } from "./actions"
 
 export const metadata: Metadata = { title: "İçerik" }
@@ -18,8 +20,9 @@ export const dynamic = "force-dynamic"
 export default async function ContentPage() {
   const { session, supabase } = await adminPageContext("manageContent")
 
-  const [groups, productsRes] = await Promise.all([
+  const [groups, slider, productsRes] = await Promise.all([
     loadSettingsByGroup(supabase),
+    loadShopSliderAdmin(supabase),
     supabase
       .from("products")
       .select("id, name, slug, base_price, main_image_url, is_active, is_featured")
@@ -60,12 +63,14 @@ export default async function ContentPage() {
       <div className="mb-6">
         <InlineAlert tone="info">
           Bu ekran bir sayfa oluşturucu değildir. Yalnızca işletmeyle birlikte değişen
-          bilgiler — duyuru, iletişim, sosyal hesaplar ve anasayfa seçkisi — düzenlenebilir.
+          bilgiler — mağaza slider'ı, duyuru, iletişim, sosyal hesaplar ve anasayfa seçkisi — düzenlenebilir.
           Girilen metinler mağazada düz metin olarak gösterilir; HTML veya betik çalıştırılmaz.
         </InlineAlert>
       </div>
 
       <div className="space-y-6">
+        <ShopSliderEditor initial={slider} />
+
         <SettingsGroupForm
           group="content"
           title="Duyuru ve iletişim"
@@ -75,14 +80,6 @@ export default async function ContentPage() {
           longFields={["announcement_text"]}
         />
 
-        <SettingsGroupForm
-          group="shop_banner"
-          title="Mağaza banner'ı"
-          description="Mağaza sayfasının en üstünde gösterilen kampanya banner'ı. Görseli önce Medya kütüphanesine yükleyip URL'sini buraya yapıştırın."
-          settings={groups.shop_banner ?? []}
-          canEditSensitive={canEditSensitive}
-          longFields={["shop_banner_subtext"]}
-        />
 
         <Panel
           title="Anasayfa seçkisi"
