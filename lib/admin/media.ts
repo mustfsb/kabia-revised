@@ -38,15 +38,42 @@ export const MEDIA_EXTENSIONS: Record<string, string> = {
   "image/avif": "avif",
 }
 
+/**
+ * Video lives in its own public bucket. It is too large for the app's 4 MB
+ * upload path, so the browser uploads it straight to Storage with a signed URL
+ * (lib/admin/video-upload.ts); 50 MB mirrors the bucket's file_size_limit.
+ */
+export const VIDEO_BUCKET = "content-video"
+export const VIDEO_MAX_BYTES = 50 * 1024 * 1024
+
+export const VIDEO_EXTENSIONS: Record<string, string> = {
+  "video/mp4": "mp4",
+  "video/webm": "webm",
+}
+
 export const MEDIA_MIME_LABELS: Record<string, string> = {
   "image/jpeg": "JPEG",
   "image/png": "PNG",
   "image/webp": "WebP",
   "image/avif": "AVIF",
+  "video/mp4": "MP4",
+  "video/webm": "WebM",
 }
 
-/** The accept attribute for every file input that feeds the library. */
+/** The accept attribute for every image input that feeds the library. */
 export const MEDIA_ACCEPT = Object.keys(MEDIA_EXTENSIONS).join(",")
+export const IMAGE_ACCEPT = MEDIA_ACCEPT
+export const VIDEO_ACCEPT = Object.keys(VIDEO_EXTENSIONS).join(",")
+
+export type MediaKind = "image" | "video"
+
+export function isVideoMime(mimeType: string): boolean {
+  return mimeType in VIDEO_EXTENSIONS
+}
+
+export function mediaKindOf(mimeType: string): MediaKind {
+  return isVideoMime(mimeType) ? "video" : "image"
+}
 
 export const MEDIA_PAGE_SIZE = 24
 
@@ -90,8 +117,16 @@ export interface MediaUsage {
  * server re-validates everything, including the actual bytes, and is the
  * boundary that counts; this only buys a better message.
  */
-export function clientFileProblem(file: { name: string; size: number; type: string }): string | null {
+export function clientFileProblem(
+  file: { name: string; size: number; type: string },
+  kind: MediaKind = "image",
+): string | null {
   if (file.size === 0) return `${file.name} boş bir dosya.`
+  if (kind === "video") {
+    if (!isVideoMime(file.type)) return `${file.name} desteklenmiyor. Yalnızca MP4 ve WebM videoları yüklenebilir.`
+    if (file.size > VIDEO_MAX_BYTES) return `${file.name} 50 MB sınırını aşıyor. Videoyu sıkıştırıp yeniden yükleyin.`
+    return null
+  }
   if (file.size > MEDIA_UPLOAD_MAX_BYTES) return `${file.name} 4 MB sınırını aşıyor. Görseli küçültüp yeniden yükleyin.`
   if (!(file.type in MEDIA_EXTENSIONS)) return `${file.name} desteklenmiyor. Yalnızca JPEG, PNG, WebP ve AVIF yüklenebilir.`
   return null
@@ -113,7 +148,7 @@ export function formatDimensions(width: number | null, height: number | null): s
  * so on. Uploads from the library page itself keep the bare `YYYY-MM/` layout.
  * An allow-list, because the folder arrives from a form field.
  */
-export const MEDIA_FOLDERS = ["products", "producers", "journal"] as const
+export const MEDIA_FOLDERS = ["products", "producers", "journal", "slider"] as const
 export type MediaFolder = (typeof MEDIA_FOLDERS)[number]
 
 export function isMediaFolder(value: unknown): value is MediaFolder {
@@ -169,7 +204,7 @@ export function safeObjectName(originalName: string, mimeType: string, folder?: 
   return mediaObjectName({
     stem: mediaStemFromFilename(originalName),
     suffix: crypto.randomUUID().slice(0, 8),
-    ext: MEDIA_EXTENSIONS[mimeType] ?? "bin",
+    ext: MEDIA_EXTENSIONS[mimeType] ?? VIDEO_EXTENSIONS[mimeType] ?? "bin",
     folder,
     month: `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}`,
   })
